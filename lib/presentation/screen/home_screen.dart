@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:luckify/domain/entity/fortune_entity.dart';
 import 'package:luckify/domain/entity/fortune_type.dart';
+import 'package:luckify/presentation/screen/fortune_chat_screen.dart';
 import 'package:luckify/presentation/widget/luckify_button.dart';
 import 'package:luckify/core/theme/luckify_text_styles.dart';
 
@@ -88,7 +89,18 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: LuckifyButton(
                     buttonText: '선택하기',
                     isActive: true,
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) => FortuneChatScreen(
+                                selectedFortune:
+                                    selectedFortune ?? fortunes.first,
+                              ),
+                        ),
+                      );
+                    },
                   ),
                 ),
             ],
