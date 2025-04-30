@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class LuckifyColors {
   static const Color primary = Color(0xFF38105A);
   static const Color primaryLight = Color(0xFFEBDDF8);
+  static const Color inputBackground = Color(0xFFF8F5FD);
 
   static const Color white = Color(0xFFFFFFFF);
   static const Color grey = Color(0xFF8E8E93);
