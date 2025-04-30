@@ -22,4 +22,18 @@ class LuckifyTextStyles {
     fontSize: 16,
     color: LuckifyColors.black,
   );
+
+  static const appBarTitle = TextStyle(
+    fontFamily: 'Moneygraphy',
+    fontWeight: FontWeight.w500,
+    fontSize: 18,
+    color: LuckifyColors.black,
+  );
+
+  static const chatInputHint = TextStyle(
+    fontFamily: 'Moneygraphy',
+    fontWeight: FontWeight.w300,
+    fontSize: 14,
+    color: LuckifyColors.grey,
+  );
 }
