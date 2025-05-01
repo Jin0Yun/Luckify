@@ -13,7 +13,7 @@ class LuckifyTextStyles {
     color: LuckifyColors.primary,
   );
 
-  static final fortuneHint = _base.copyWith(
+  static final fortuneSubtitle = _base.copyWith(
     fontWeight: FontWeight.w200,
     fontSize: 13,
     color: LuckifyColors.grey,
@@ -29,9 +29,27 @@ class LuckifyTextStyles {
     fontSize: 18,
   );
 
-  static final chatInputHint = _base.copyWith(
+  static final inputHintText = _base.copyWith(
     fontWeight: FontWeight.w300,
     fontSize: 14,
+    color: LuckifyColors.grey,
+  );
+
+  static final messageBotText = _base.copyWith(
+    fontWeight: FontWeight.w300,
+    fontSize: 14,
+    color: LuckifyColors.white,
+  );
+
+  static final messageUserText = _base.copyWith(
+    fontWeight: FontWeight.w300,
+    fontSize: 14,
+    color: LuckifyColors.primary,
+  );
+
+  static final timestampText = _base.copyWith(
+    fontWeight: FontWeight.w300,
+    fontSize: 11,
     color: LuckifyColors.grey,
   );
 }
