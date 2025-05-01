@@ -34,7 +34,7 @@ class ChatInputField extends StatelessWidget {
               },
               decoration: InputDecoration(
                 hintText: '메시지를 입력하세요',
-                hintStyle: LuckifyTextStyles.chatInputHint,
+                hintStyle: LuckifyTextStyles.inputHintText,
                 filled: true,
                 fillColor: LuckifyColors.surfaceSubtle,
                 contentPadding: const EdgeInsets.symmetric(

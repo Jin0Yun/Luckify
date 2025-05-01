@@ -53,7 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: 12),
                     Text(
                       '원하는 운세를 선택해보세요.',
-                      style: LuckifyTextStyles.fortuneHint,
+                      style: LuckifyTextStyles.fortuneSubtitle,
                     ),
                   ],
                 ),
@@ -85,7 +85,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
               if (selectedFortune != null)
                 Padding(
-                  padding: const EdgeInsets.only(bottom: 16.0),
+                  padding: const EdgeInsets.only(bottom: 8.0),
                   child: LuckifyButton(
                     buttonText: '선택하기',
                     isActive: true,

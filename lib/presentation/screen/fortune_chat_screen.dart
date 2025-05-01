@@ -102,7 +102,7 @@ class _FortuneChatScreenState extends State<FortuneChatScreen> {
             ),
             const SizedBox(height: 12),
             Padding(
-              padding: const EdgeInsets.only(bottom: 16.0),
+              padding: const EdgeInsets.only(bottom: 8.0),
               child: ChatInputField(
                 controller: _textController,
                 focusNode: _focusNode,
