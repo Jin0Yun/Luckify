@@ -1,0 +1,28 @@
+import 'package:luckify/domain/entity/fortune_entity.dart';
+import 'package:luckify/domain/entity/message_entity.dart';
+import 'package:luckify/domain/enum/fortune_type.dart';
+import 'package:luckify/domain/enum/message_role.dart';
+
+class FortuneMessageEntity extends MessageEntity {
+  final String? fortuneId;
+  final FortuneEntity? fortune;
+  final String? userInput;
+
+  const FortuneMessageEntity({
+    required String id,
+    required String content,
+    required MessageRole sender,
+    required DateTime timestamp,
+    this.fortuneId,
+    this.fortune,
+    this.userInput,
+  }) : super(
+    id: id,
+    content: content,
+    sender: sender,
+    timestamp: timestamp,
+  );
+
+  bool get isFortuneReading => fortune != null;
+  bool get isZodiacFortune => fortune?.type == FortuneType.zodiacFortune;
+}
