@@ -1,7 +1,7 @@
 import 'package:luckify/domain/entity/fortune_entity.dart';
 import 'package:luckify/domain/entity/message_entity.dart';
 import 'package:luckify/domain/enum/fortune_type.dart';
-import 'package:luckify/domain/enum/message_role.dart';
+import 'package:luckify/domain/enum/message_sender.dart';
 
 class FortuneMessageEntity extends MessageEntity {
   final String? fortuneId;
@@ -11,7 +11,7 @@ class FortuneMessageEntity extends MessageEntity {
   const FortuneMessageEntity({
     required String id,
     required String content,
-    required MessageRole sender,
+    required MessageSender sender,
     required DateTime timestamp,
     this.fortuneId,
     this.fortune,
