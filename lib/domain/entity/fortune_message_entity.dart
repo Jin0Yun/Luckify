@@ -4,7 +4,6 @@ import 'package:luckify/domain/enum/fortune_type.dart';
 import 'package:luckify/domain/enum/message_sender.dart';
 
 class FortuneMessageEntity extends MessageEntity {
-  final String? fortuneId;
   final FortuneEntity? fortune;
   final String? userInput;
 
@@ -13,7 +12,6 @@ class FortuneMessageEntity extends MessageEntity {
     required String content,
     required MessageSender sender,
     required DateTime timestamp,
-    this.fortuneId,
     this.fortune,
     this.userInput,
   }) : super(

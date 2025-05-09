@@ -5,18 +5,10 @@ class RequestDTO {
   final String model;
   final List<MessageDTO> messages;
 
-  const RequestDTO({
-    required this.model,
-    required this.messages,
-  });
+  const RequestDTO({required this.model, required this.messages});
 
-  factory RequestDTO.withDefaultModel({
-    required List<MessageDTO> messages,
-  }) {
-    return RequestDTO(
-      model: ApiConstants.gpt4oMini,
-      messages: messages,
-    );
+  factory RequestDTO.withDefaultModel({required List<MessageDTO> messages}) {
+    return RequestDTO(model: ApiConstants.gpt4oMini, messages: messages);
   }
 
   Map<String, dynamic> toJson() {

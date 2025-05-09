@@ -4,8 +4,5 @@ class RequestEntity {
   final String model;
   final List<MessageEntity> messages;
 
-  const RequestEntity({
-    required this.model,
-    required this.messages,
-  });
+  const RequestEntity({required this.model, required this.messages});
 }

@@ -2,10 +2,7 @@ class MessageDTO {
   final String role;
   final String content;
 
-  const MessageDTO({
-    required this.role,
-    required this.content,
-  });
+  const MessageDTO({required this.role, required this.content});
 
   factory MessageDTO.fromJson(Map<String, dynamic>? json) {
     if (json == null) {
@@ -18,9 +15,6 @@ class MessageDTO {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'role': role,
-      'content': content,
-    };
+    return {'role': role, 'content': content};
   }
 }

@@ -1,19 +1,18 @@
 import 'package:luckify/data/dto/choice_dto.dart';
-import 'package:luckify/data/mapper/base_mapper.dart';
 import 'package:luckify/data/mapper/message_mapper.dart';
 import 'package:luckify/domain/entity/choice_entity.dart';
+import 'package:luckify/data/mapper/base_mapper.dart';
 
 class ChoiceMapper implements BaseMapper<ChoiceDTO, ChoiceEntity> {
-  final MessageMapper _messageMapper;
+  final MessageMapper _messageDTOMapper;
 
-  ChoiceMapper(this._messageMapper);
+  ChoiceMapper(this._messageDTOMapper);
 
   @override
   ChoiceDTO toDTO(ChoiceEntity entity) {
     return ChoiceDTO(
       index: entity.index,
-      message: _messageMapper.toDTO(entity.message),
-      finishReason: entity.finishReason,
+      message: _messageDTOMapper.toDTO(entity.message),
     );
   }
 
@@ -21,8 +20,7 @@ class ChoiceMapper implements BaseMapper<ChoiceDTO, ChoiceEntity> {
   ChoiceEntity toEntity(ChoiceDTO dto) {
     return ChoiceEntity(
       index: dto.index,
-      message: _messageMapper.toEntity(dto.message),
-      finishReason: dto.finishReason,
+      message: _messageDTOMapper.toEntity(dto.message),
     );
   }
 }

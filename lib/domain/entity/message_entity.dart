@@ -1,9 +1,9 @@
-import 'package:luckify/domain/enum/message_role.dart';
+import 'package:luckify/domain/enum/message_sender.dart';
 
 class MessageEntity {
   final String id;
   final String content;
-  final MessageRole sender;
+  final MessageSender sender;
   final DateTime timestamp;
 
   const MessageEntity({
