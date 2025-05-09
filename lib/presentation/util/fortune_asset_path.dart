@@ -1,9 +1,8 @@
-enum FortuneType {
-  fortuneToday,
-  zodiacFortune;
+import 'package:luckify/domain/enum/fortune_type.dart';
 
-  String get path {
-    switch (this) {
+class FortuneAssetPath {
+  static String getImagePath(FortuneType type) {
+    switch (type) {
       case FortuneType.fortuneToday:
         return 'assets/images/fortune_today.png';
       case FortuneType.zodiacFortune:
