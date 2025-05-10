@@ -1,4 +1,4 @@
-import 'package:luckify/data/api_constants.dart';
+import 'package:luckify/core/constants/api_constants.dart';
 import 'package:luckify/data/dto/message_dto.dart';
 
 class RequestDTO {
