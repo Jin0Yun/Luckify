@@ -5,4 +5,5 @@ abstract class BaseApi {
   HttpMethod get method;
   Map<String, dynamic>? get data;
   Map<String, dynamic>? get query;
+  Map<String, String> get headers;
 }

@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:luckify/data/logger/logger.dart';
+import 'package:luckify/core/logger/logger.dart';
 
 class CustomInterceptor extends Interceptor {
   final AppLogger logger;
