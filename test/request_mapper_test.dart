@@ -3,9 +3,9 @@ import 'package:luckify/data/dto/message_dto.dart';
 import 'package:luckify/data/dto/request_dto.dart';
 import 'package:luckify/data/mapper/message_mapper.dart';
 import 'package:luckify/data/mapper/request_mapper.dart';
-import 'package:luckify/domain/entity/message_entity.dart';
-import 'package:luckify/domain/entity/request_entity.dart';
 import 'package:luckify/domain/enum/message_sender.dart';
+import 'object_builders.dart';
+import 'test_constants.dart';
 
 void main() {
   late RequestMapper requestMapper;
@@ -19,22 +19,20 @@ void main() {
   group('RequestMapper', () {
     test('toDTO should convert RequestEntity to RequestDTO correctly', () {
       // Given
-      final messageEntity1 = MessageEntity(
+      final messageEntity1 = ObjectBuilders.message(
         id: 'assistant-message-id',
         content: '별자리를 입력해주세요',
         sender: MessageSender.assistant,
-        timestamp: DateTime(2025, 5, 10),
       );
 
-      final messageEntity2 = MessageEntity(
+      final messageEntity2 = ObjectBuilders.message(
         id: 'user-message-id',
-        content: '물고기자리',
+        content: TestConstants.zodiacSign,
         sender: MessageSender.user,
-        timestamp: DateTime(2025, 5, 10),
       );
 
-      final requestEntity = RequestEntity(
-        model: 'gpt-4o-mini',
+      final requestEntity = ObjectBuilders.request(
+        model: TestConstants.gptModel,
         messages: [messageEntity1, messageEntity2],
       );
 
@@ -42,17 +40,17 @@ void main() {
       final requestDTO = requestMapper.toDTO(requestEntity);
 
       // Then
-      expect(requestDTO.model, 'gpt-4o-mini');
+      expect(requestDTO.model, TestConstants.gptModel);
       expect(requestDTO.messages.length, 2);
       expect(requestDTO.messages[0].role, 'assistant');
       expect(requestDTO.messages[0].content, '별자리를 입력해주세요');
       expect(requestDTO.messages[1].role, 'user');
-      expect(requestDTO.messages[1].content, '물고기자리');
+      expect(requestDTO.messages[1].content, TestConstants.zodiacSign);
     });
 
     test('toEntity should convert RequestDTO to RequestEntity correctly', () {
       // Given
-      final messageDTO1 = MessageDTO(role: 'user', content: '물고기자리');
+      final messageDTO1 = MessageDTO(role: 'user', content: TestConstants.zodiacSign);
 
       final messageDTO2 = MessageDTO(
         role: 'assistant',
@@ -60,7 +58,7 @@ void main() {
       );
 
       final requestDTO = RequestDTO(
-        model: 'gpt-4o-mini',
+        model: TestConstants.gptModel,
         messages: [messageDTO1, messageDTO2],
       );
 
@@ -68,9 +66,9 @@ void main() {
       final requestEntity = requestMapper.toEntity(requestDTO);
 
       // Then
-      expect(requestEntity.model, 'gpt-4o-mini');
+      expect(requestEntity.model, TestConstants.gptModel);
       expect(requestEntity.messages.length, 2);
-      expect(requestEntity.messages[0].content, '물고기자리');
+      expect(requestEntity.messages[0].content, TestConstants.zodiacSign);
       expect(requestEntity.messages[0].sender, MessageSender.user);
       expect(requestEntity.messages[1].content, '물고기자리의 운세를 확인해볼게요.');
       expect(requestEntity.messages[1].sender, MessageSender.assistant);
@@ -79,7 +77,7 @@ void main() {
     test('round trip conversion should preserve data', () {
       // Given
       final originalDTO = RequestDTO(
-        model: 'gpt-4o-mini',
+        model: TestConstants.gptModel,
         messages: [
           MessageDTO(role: 'user', content: '물고기자리 운세 알려줘'),
           MessageDTO(role: 'assistant', content: '물고기자리 운세를 알려드리겠습니다.'),
@@ -93,10 +91,10 @@ void main() {
       // Then
       expect(convertedDTO.model, originalDTO.model);
       expect(convertedDTO.messages.length, originalDTO.messages.length);
-      expect(convertedDTO.messages[0].role, originalDTO.messages[0].role);
-      expect(convertedDTO.messages[0].content, originalDTO.messages[0].content);
-      expect(convertedDTO.messages[1].role, originalDTO.messages[1].role);
-      expect(convertedDTO.messages[1].content, originalDTO.messages[1].content);
+      for (int i = 0; i < originalDTO.messages.length; i++) {
+        expect(convertedDTO.messages[i].role, originalDTO.messages[i].role);
+        expect(convertedDTO.messages[i].content, originalDTO.messages[i].content);
+      }
     });
   });
 }

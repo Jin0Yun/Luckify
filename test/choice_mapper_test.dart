@@ -4,8 +4,9 @@ import 'package:luckify/data/dto/message_dto.dart';
 import 'package:luckify/data/mapper/choice_mapper.dart';
 import 'package:luckify/data/mapper/message_mapper.dart';
 import 'package:luckify/domain/entity/choice_entity.dart';
-import 'package:luckify/domain/entity/message_entity.dart';
 import 'package:luckify/domain/enum/message_sender.dart';
+import 'object_builders.dart';
+import 'test_constants.dart';
 
 void main() {
   late ChoiceMapper choiceMapper;
@@ -19,11 +20,9 @@ void main() {
   group('ChoiceMapper', () {
     test('toDTO should convert ChoiceEntity to ChoiceDTO correctly', () {
       // Given
-      final messageEntity = MessageEntity(
-        id: 'test-id',
-        content: '물고기자리의 운세입니다. 이번 주는 대인관계에서 좋은 기운이 있을 것입니다.',
+      final messageEntity = ObjectBuilders.message(
+        content: TestConstants.fortuneContent,
         sender: MessageSender.assistant,
-        timestamp: DateTime(2025, 5, 10),
       );
 
       final choiceEntity = ChoiceEntity(index: 0, message: messageEntity);
@@ -34,15 +33,12 @@ void main() {
       // Then
       expect(choiceDTO.index, 0);
       expect(choiceDTO.message.role, 'assistant');
-      expect(
-        choiceDTO.message.content,
-        '물고기자리의 운세입니다. 이번 주는 대인관계에서 좋은 기운이 있을 것입니다.',
-      );
+      expect(choiceDTO.message.content, TestConstants.fortuneContent);
     });
 
     test('toEntity should convert ChoiceDTO to ChoiceEntity correctly', () {
       // Given
-      final messageDTO = MessageDTO(role: 'user', content: '물고기자리');
+      final messageDTO = MessageDTO(role: 'user', content: TestConstants.zodiacSign);
 
       final choiceDTO = ChoiceDTO(index: 1, message: messageDTO);
 
@@ -51,9 +47,9 @@ void main() {
 
       // Then
       expect(choiceEntity.index, 1);
-      expect(choiceEntity.message.content, '물고기자리');
+      expect(choiceEntity.message.content, TestConstants.zodiacSign);
       expect(choiceEntity.message.sender, MessageSender.user);
-      expect(choiceEntity.message.id.isNotEmpty, true);
+      expect(choiceEntity.message.id, isNotEmpty);
     });
 
     test('round trip conversion should preserve data', () {
@@ -62,7 +58,7 @@ void main() {
         index: 2,
         message: MessageDTO(
           role: 'assistant',
-          content: '물고기자리의 운세입니다. 이번 주는 대인관계에서 좋은 기운이 있을 것입니다.',
+          content: TestConstants.fortuneContent,
         ),
       );
 

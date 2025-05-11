@@ -6,9 +6,10 @@ import 'package:luckify/data/mapper/choice_mapper.dart';
 import 'package:luckify/data/mapper/message_mapper.dart';
 import 'package:luckify/data/mapper/response_mapper.dart';
 import 'package:luckify/domain/entity/choice_entity.dart';
-import 'package:luckify/domain/entity/message_entity.dart';
 import 'package:luckify/domain/entity/response_entity.dart';
 import 'package:luckify/domain/enum/message_sender.dart';
+import 'object_builders.dart';
+import 'test_constants.dart';
 
 void main() {
   late ResponseMapper responseMapper;
@@ -24,11 +25,10 @@ void main() {
   group('ResponseMapper', () {
     test('toDTO should convert ResponseEntity to ResponseDTO correctly', () {
       // Given
-      final messageEntity = MessageEntity(
+      final messageEntity = ObjectBuilders.message(
         id: 'fortune-reading-id',
         content: '물고기자리는 이번 주 금전운이 좋습니다. 새로운 투자 기회에 관심을 가져보세요.',
         sender: MessageSender.assistant,
-        timestamp: DateTime(2025, 5, 10),
       );
 
       final choiceEntity = ChoiceEntity(index: 0, message: messageEntity);
@@ -36,8 +36,8 @@ void main() {
       final responseEntity = ResponseEntity(
         id: 'response-id-1234',
         object: 'chat.completion',
-        created: DateTime(2025, 5, 10),
-        model: 'gpt-4o-mini',
+        created: TestConstants.testDate,
+        model: TestConstants.gptModel,
         choices: [choiceEntity],
       );
 
@@ -51,14 +51,11 @@ void main() {
         responseDTO.created,
         responseEntity.created.millisecondsSinceEpoch ~/ 1000,
       );
-      expect(responseDTO.model, 'gpt-4o-mini');
+      expect(responseDTO.model, TestConstants.gptModel);
       expect(responseDTO.choices.length, 1);
       expect(responseDTO.choices[0].index, 0);
       expect(responseDTO.choices[0].message.role, 'assistant');
-      expect(
-        responseDTO.choices[0].message.content,
-        '물고기자리는 이번 주 금전운이 좋습니다. 새로운 투자 기회에 관심을 가져보세요.',
-      );
+      expect(responseDTO.choices[0].message.content, messageEntity.content);
     });
 
     test('toEntity should convert ResponseDTO to ResponseEntity correctly', () {
@@ -70,13 +67,13 @@ void main() {
 
       final choiceDTO = ChoiceDTO(index: 0, message: messageDTO);
 
-      final createdTimestamp = 1747756800;
+      const createdTimestamp = 1747756800;
 
       final responseDTO = ResponseDTO(
         id: 'response-12345',
         object: 'chat.completion',
         created: createdTimestamp,
-        model: 'gpt-4o-mini',
+        model: TestConstants.gptModel,
         choices: [choiceDTO],
       );
 
@@ -90,25 +87,22 @@ void main() {
         responseEntity.created.millisecondsSinceEpoch,
         createdTimestamp * 1000,
       );
-      expect(responseEntity.model, 'gpt-4o-mini');
+      expect(responseEntity.model, TestConstants.gptModel);
       expect(responseEntity.choices.length, 1);
       expect(responseEntity.choices[0].index, 0);
       expect(responseEntity.choices[0].message.sender, MessageSender.assistant);
-      expect(
-        responseEntity.choices[0].message.content,
-        '물고기자리는 대인관계에서 좋은 기운이 있을 것입니다. 새로운 만남이 있을 수 있으니 주변을 잘 살펴보세요.',
-      );
+      expect(responseEntity.choices[0].message.content, messageDTO.content);
     });
 
     test('round trip conversion should preserve data', () {
       // Given
-      final createdTimestamp = 1747756800;
+      const createdTimestamp = 1746802800;
 
       final originalDTO = ResponseDTO(
         id: 'api-response-1234',
         object: 'chat.completion',
         created: createdTimestamp,
-        model: 'gpt-4o-mini',
+        model: TestConstants.gptModel,
         choices: [
           ChoiceDTO(
             index: 0,
