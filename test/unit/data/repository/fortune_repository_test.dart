@@ -7,9 +7,9 @@ import 'package:luckify/data/mapper/request_mapper.dart';
 import 'package:luckify/data/mapper/response_mapper.dart';
 import 'package:luckify/domain/enum/fortune_type.dart';
 import 'package:luckify/data/dto/response_dto.dart';
-import 'fortune_repository_test.mocks.dart';
-import 'object_builders.dart';
-import 'test_constants.dart';
+import '../../../mocks/fortune_repository_test.mocks.dart';
+import '../../../builders/object_builders.dart';
+import '../../core/constants/test_constants.dart';
 
 @GenerateMocks([NetworkClientInterface, RequestMapper, ResponseMapper])
 void main() {

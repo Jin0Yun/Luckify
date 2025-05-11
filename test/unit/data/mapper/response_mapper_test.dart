@@ -8,8 +8,8 @@ import 'package:luckify/data/mapper/response_mapper.dart';
 import 'package:luckify/domain/entity/choice_entity.dart';
 import 'package:luckify/domain/entity/response_entity.dart';
 import 'package:luckify/domain/enum/message_sender.dart';
-import 'object_builders.dart';
-import 'test_constants.dart';
+import '../../../builders/object_builders.dart';
+import '../../core/constants/test_constants.dart';
 
 void main() {
   late ResponseMapper responseMapper;

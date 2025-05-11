@@ -9,9 +9,9 @@ import 'package:luckify/presentation/prompt/resolvers/prompt_resolver.dart';
 import 'package:luckify/domain/enum/fortune_type.dart';
 import 'package:luckify/domain/enum/message_sender.dart';
 import 'package:luckify/core/exceptions/fortune_exception.dart';
-import 'get_fortune_reading_usecase_test.mocks.dart';
-import 'object_builders.dart';
-import 'test_constants.dart';
+import '../../../mocks/get_fortune_reading_usecase_test.mocks.dart';
+import '../../../builders/object_builders.dart';
+import '../../core/constants/test_constants.dart';
 
 @GenerateMocks([
   FortuneRepository,

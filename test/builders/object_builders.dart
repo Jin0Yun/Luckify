@@ -9,7 +9,7 @@ import 'package:luckify/data/dto/request_dto.dart';
 import 'package:luckify/data/dto/response_dto.dart';
 import 'package:luckify/data/dto/message_dto.dart';
 import 'package:luckify/data/dto/choice_dto.dart';
-import 'test_constants.dart';
+import '../unit/core/constants/test_constants.dart';
 
 abstract final class ObjectBuilders {
   static MessageEntity message({

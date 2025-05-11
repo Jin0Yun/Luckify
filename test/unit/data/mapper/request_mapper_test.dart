@@ -4,8 +4,8 @@ import 'package:luckify/data/dto/request_dto.dart';
 import 'package:luckify/data/mapper/message_mapper.dart';
 import 'package:luckify/data/mapper/request_mapper.dart';
 import 'package:luckify/domain/enum/message_sender.dart';
-import 'object_builders.dart';
-import 'test_constants.dart';
+import '../../../builders/object_builders.dart';
+import '../../core/constants/test_constants.dart';
 
 void main() {
   late RequestMapper requestMapper;

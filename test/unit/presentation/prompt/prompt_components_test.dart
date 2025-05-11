@@ -7,8 +7,8 @@ import 'package:luckify/presentation/prompt/generators/zodiac_fortune_prompt_gen
 import 'package:luckify/presentation/prompt/generators/fortune_prompt_generator.dart';
 import 'package:luckify/domain/enum/fortune_type.dart';
 import 'package:luckify/presentation/prompt/resolvers/prompt_resolver.dart';
-import 'object_builders.dart';
-import 'test_constants.dart';
+import '../../../builders/object_builders.dart';
+import '../../core/constants/test_constants.dart';
 
 void main() {
   group('TodayFortunePromptGenerator', () {
