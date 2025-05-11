@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:luckify/data/logger/logger.dart';
+import 'package:luckify/core/logger/logger.dart';
 
 class ConsoleLogger implements AppLogger {
   @override

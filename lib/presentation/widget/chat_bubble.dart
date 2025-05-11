@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:luckify/core/theme/luckify_colors.dart';
 import 'package:luckify/core/theme/luckify_text_styles.dart';
-import 'package:luckify/domain/entity/chat_message.dart';
 import 'package:luckify/domain/entity/fortune_entity.dart';
-import 'package:luckify/domain/entity/message_sender.dart';
+import 'package:luckify/domain/entity/fortune_message_entity.dart';
 import 'package:intl/intl.dart';
+import 'package:luckify/presentation/util/fortune_asset_path.dart';
 
 class ChatBubble extends StatelessWidget {
-  final ChatMessage message;
+  final FortuneMessageEntity message;
   final FortuneEntity selectedFortune;
 
   const ChatBubble({
@@ -18,7 +18,7 @@ class ChatBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isUser = message.sender == MessageSender.user;
+    final isUser = message.sender.isUser;
     final screenWidth = MediaQuery.of(context).size.width;
 
     return isUser
@@ -34,8 +34,8 @@ class ChatBubble extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Text(
-              _formatTime(message.timestamp),
-              style: LuckifyTextStyles.timestampText
+            _formatTime(message.timestamp),
+            style: LuckifyTextStyles.timestampText
           ),
           const SizedBox(width: 6),
           Container(
@@ -46,8 +46,10 @@ class ChatBubble extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
-                message.content,
-                style: LuckifyTextStyles.messageUserText
+              message.content,
+              style: LuckifyTextStyles.messageUserText,
+              overflow: TextOverflow.visible,
+              softWrap: true,
             ),
           ),
         ],
@@ -63,14 +65,19 @@ class ChatBubble extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 18,
-            backgroundImage: AssetImage(selectedFortune.imageType.path),
+            backgroundImage: AssetImage(
+              FortuneAssetPath.getImagePath(selectedFortune.type),
+            ),
             backgroundColor: LuckifyColors.white,
           ),
           const SizedBox(width: 8),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(selectedFortune.name, style: LuckifyTextStyles.fortuneSubtitle),
+              Text(
+                selectedFortune.name,
+                style: LuckifyTextStyles.fortuneSubtitle,
+              ),
               const SizedBox(height: 4),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
@@ -86,14 +93,16 @@ class ChatBubble extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                        message.content,
-                        style: LuckifyTextStyles.messageBotText
+                      message.content,
+                      style: LuckifyTextStyles.messageBotText,
+                      overflow: TextOverflow.visible,
+                      softWrap: true,
                     ),
                   ),
                   const SizedBox(width: 6),
                   Text(
-                      _formatTime(message.timestamp),
-                      style: LuckifyTextStyles.timestampText
+                    _formatTime(message.timestamp),
+                    style: LuckifyTextStyles.timestampText,
                   ),
                 ],
               ),

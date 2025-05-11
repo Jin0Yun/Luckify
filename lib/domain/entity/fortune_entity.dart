@@ -1,13 +1,15 @@
-import 'package:luckify/domain/entity/fortune_type.dart';
+import 'package:luckify/domain/enum/fortune_type.dart';
 
 class FortuneEntity {
   final int id;
   final String name;
-  final FortuneType imageType;
+  final FortuneType type;
 
   const FortuneEntity({
     required this.id,
     required this.name,
-    required this.imageType,
+    required this.type,
   });
+
+  bool get requiresUserInput => type == FortuneType.zodiacFortune;
 }
