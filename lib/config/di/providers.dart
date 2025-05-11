@@ -18,6 +18,7 @@ import 'package:luckify/core/utils/uuid_generator.dart';
 import 'package:luckify/domain/enum/fortune_type.dart';
 import 'package:luckify/domain/repository/fortune_repository.dart';
 import 'package:luckify/domain/usecase/get_fortune_reading_usecase.dart';
+import 'package:luckify/presentation/formatters/fortune_content_formatterImpl.dart';
 import 'package:luckify/presentation/prompt/generators/fortune_prompt_generator.dart';
 import 'package:luckify/presentation/prompt/generators/today_fortune_prompt_generator.dart';
 import 'package:luckify/presentation/prompt/generators/zodiac_fortune_prompt_generator.dart';
@@ -106,13 +107,15 @@ final fortuneRepositoryProvider = Provider<FortuneRepository>((ref) {
     networkClient: ref.watch(networkClientProvider),
     requestMapper: ref.watch(requestMapperProvider),
     responseMapper: ref.watch(responseMapperProvider),
-    uuidGenerator: ref.watch(uuidGeneratorProvider),
     apiKey: ref.watch(apiKeyProvider),
-    promptResolver: ref.watch(promptResolverProvider),
-    contentFormatter: ref.watch(contentFormatterProvider),
   );
 });
 
 final getFortuneReadingUseCaseProvider = Provider<GetFortuneReadingUseCase>((ref) {
-  return GetFortuneReadingUseCase(ref.watch(fortuneRepositoryProvider));
+  return GetFortuneReadingUseCase(
+    repository: ref.watch(fortuneRepositoryProvider),
+    uuidGenerator: ref.watch(uuidGeneratorProvider),
+    promptResolver: ref.watch(promptResolverProvider),
+    contentFormatter: ref.watch(contentFormatterProvider),
+  );
 });

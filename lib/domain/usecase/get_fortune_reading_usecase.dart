@@ -1,14 +1,30 @@
 import 'package:luckify/core/constants/api_constants.dart';
+import 'package:luckify/core/exceptions/fortune_exception.dart';
+import 'package:luckify/core/utils/uuid_generator.dart';
 import 'package:luckify/domain/entity/fortune_entity.dart';
 import 'package:luckify/domain/entity/fortune_message_entity.dart';
 import 'package:luckify/domain/entity/message_entity.dart';
 import 'package:luckify/domain/entity/request_entity.dart';
+import 'package:luckify/domain/enum/message_sender.dart';
 import 'package:luckify/domain/repository/fortune_repository.dart';
+import 'package:luckify/presentation/formatters/fortune_content_formatter.dart';
+import 'package:luckify/presentation/prompt/resolvers/prompt_resolver.dart';
 
 class GetFortuneReadingUseCase {
   final FortuneRepository _repository;
+  final UuidGenerator _uuidGenerator;
+  final PromptResolver _promptResolver;
+  final FortuneContentFormatter _contentFormatter;
 
-  GetFortuneReadingUseCase(this._repository);
+  GetFortuneReadingUseCase({
+    required FortuneRepository repository,
+    required UuidGenerator uuidGenerator,
+    required PromptResolver promptResolver,
+    required FortuneContentFormatter contentFormatter,
+  })  : _repository = repository,
+        _uuidGenerator = uuidGenerator,
+        _promptResolver = promptResolver,
+        _contentFormatter = contentFormatter;
 
   Future<FortuneMessageEntity> execute({
     required FortuneEntity fortune,
@@ -16,13 +32,49 @@ class GetFortuneReadingUseCase {
     String? userInput,
     String model = ApiConstants.gpt4oMini,
   }) async {
-    final request = RequestEntity(
-      model: model,
-      messages: messages,
-      fortune: fortune,
-      userInput: userInput,
-    );
+    try {
+      final originalRequest = RequestEntity(
+        model: model,
+        messages: messages,
+        fortune: fortune,
+        userInput: userInput,
+      );
 
-    return await _repository.getFortuneReading(request);
+      final prompt = _promptResolver.resolvePrompt(originalRequest);
+
+      final promptMessage = MessageEntity(
+        id: _uuidGenerator.generate(),
+        content: prompt,
+        sender: MessageSender.assistant,
+        timestamp: DateTime.now(),
+      );
+
+      final updatedRequest = RequestEntity(
+        model: model,
+        messages: [...messages, promptMessage],
+        fortune: fortune,
+        userInput: userInput,
+      );
+
+      final responseEntity = await _repository.fetchFortuneFromAPI(updatedRequest);
+
+      if (responseEntity.choices.isEmpty) {
+        throw const FortuneException('운세 응답에 선택지가 없습니다.');
+      }
+
+      final messageContent = responseEntity.choices.first.message.content;
+      final formattedContent = _contentFormatter.format(messageContent, originalRequest);
+
+      return FortuneMessageEntity(
+        id: _uuidGenerator.generate(),
+        content: formattedContent,
+        sender: MessageSender.assistant,
+        timestamp: DateTime.now(),
+        fortune: fortune,
+        userInput: userInput,
+      );
+    } catch (e) {
+      throw FortuneException('운세 조회 중 오류가 발생했습니다: $e');
+    }
   }
 }
