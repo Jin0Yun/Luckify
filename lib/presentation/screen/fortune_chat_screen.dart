@@ -7,9 +7,11 @@ import 'package:luckify/domain/entity/fortune_entity.dart';
 import 'package:luckify/domain/entity/fortune_message_entity.dart';
 import 'package:luckify/domain/entity/message_entity.dart';
 import 'package:luckify/domain/enum/message_sender.dart';
+import 'package:luckify/domain/enum/fortune_type.dart';
 import 'package:luckify/presentation/widget/chat_bubble.dart';
 import 'package:luckify/presentation/widget/chat_input_field.dart';
 import 'package:luckify/core/utils/uuid_generator.dart';
+import 'package:luckify/core/constants/zodiac_constants.dart';
 
 class FortuneChatScreen extends ConsumerStatefulWidget {
   final FortuneEntity selectedFortune;
@@ -159,6 +161,25 @@ class _FortuneChatScreenState extends ConsumerState<FortuneChatScreen> {
     );
     _addMessage(userMessage);
     _textController.clear();
+
+    if (widget.selectedFortune.type == FortuneType.zodiacFortune) {
+      final zodiac = ZodiacConstants.findZodiac(text);
+
+      if (zodiac == null) {
+        final errorMessage = FortuneMessageEntity(
+          id: _generateId(),
+          content: "올바른 별자리를 입력해주세요.\n\n"
+              "예시: 양자리, 황소자리, 쌍둥이자리, 게자리 등",
+          sender: MessageSender.assistant,
+          timestamp: DateTime.now(),
+          fortune: widget.selectedFortune,
+        );
+        _addMessage(errorMessage);
+        return;
+      }
+
+      return _requestFortune(userInput: zodiac);
+    }
 
     return _requestFortune(userInput: text);
   }
