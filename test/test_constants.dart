@@ -1,10 +1,10 @@
 abstract final class TestConstants {
   static const String gptModel = 'gpt-4o-mini';
   static const String testId = 'test-id';
+  static const String messageId = 'msg-id';
   static const String apiKey = 'test-api-key';
   static final DateTime testDate = DateTime(2025, 5, 10);
   static const int testTimestamp = 1746802800;
-
   static const int fortuneId = 1;
   static const String zodiacSign = '물고기자리';
   static const String fortuneContent =
