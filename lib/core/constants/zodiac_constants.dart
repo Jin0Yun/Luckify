@@ -15,11 +15,19 @@ class ZodiacConstants {
   };
 
   static String? findZodiac(String input) {
-    if (input.trim().length <= 1) return null;
-
     final normalized = input.trim();
-    final fullName = normalized.endsWith('자리') ? normalized : '${normalized}자리';
 
-    return zodiacNames.contains(fullName) ? fullName : null;
+    if (normalized.isEmpty) return null;
+
+    if (zodiacNames.contains(normalized)) {
+      return normalized;
+    }
+
+    final fullName = normalized.endsWith('자리') ? normalized : '${normalized}자리';
+    if (zodiacNames.contains(fullName)) {
+      return fullName;
+    }
+
+    return null;
   }
 }
