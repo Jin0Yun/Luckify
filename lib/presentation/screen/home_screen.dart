@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:luckify/domain/entity/fortune_entity.dart';
-import 'package:luckify/domain/entity/fortune_type.dart';
+import 'package:luckify/domain/enum/fortune_type.dart';
 import 'package:luckify/presentation/screen/fortune_chat_screen.dart';
 import 'package:luckify/presentation/widget/luckify_button.dart';
 import 'package:luckify/core/theme/luckify_text_styles.dart';
@@ -19,12 +19,12 @@ class _HomeScreenState extends State<HomeScreen> {
     const FortuneEntity(
       id: 1,
       name: '오늘의 운세',
-      imageType: FortuneType.fortuneToday,
+      type: FortuneType.fortuneToday,
     ),
     const FortuneEntity(
       id: 2,
       name: '별자리 운세',
-      imageType: FortuneType.zodiacFortune,
+      type: FortuneType.zodiacFortune,
     ),
   ];
 
@@ -72,7 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     return LuckifyButton(
                       buttonText: fortune.name,
                       isActive: selectedFortune?.id == fortune.id,
-                      imageName: fortune.imageType,
+                      fortuneType: fortune.type,
                       onPressed: () {
                         setState(() {
                           selectedFortune = fortune;
@@ -93,11 +93,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder:
-                              (context) => FortuneChatScreen(
-                                selectedFortune:
-                                    selectedFortune ?? fortunes.first,
-                              ),
+                          builder: (context) => FortuneChatScreen(
+                            selectedFortune: selectedFortune ?? fortunes.first,
+                          ),
                         ),
                       );
                     },

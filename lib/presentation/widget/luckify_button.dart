@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:luckify/domain/entity/fortune_type.dart';
+import 'package:luckify/domain/enum/fortune_type.dart';
 import 'package:luckify/core/theme/luckify_colors.dart';
 import 'package:luckify/core/theme/luckify_text_styles.dart';
+import 'package:luckify/presentation/util/fortune_asset_path.dart';
 
 class LuckifyButton extends StatelessWidget {
   final String buttonText;
   final VoidCallback? onPressed;
   final bool isActive;
-  final FortuneType? imageName;
+  final FortuneType? fortuneType;
 
   const LuckifyButton({
     required this.buttonText,
     this.onPressed,
     this.isActive = false,
-    this.imageName,
+    this.fortuneType,
     super.key,
   });
 
@@ -32,10 +33,9 @@ class LuckifyButton extends StatelessWidget {
             RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
               side: BorderSide(
-                color:
-                    isActive
-                        ? Colors.transparent
-                        : LuckifyColors.primary.withValues(alpha: 0.2),
+                color: isActive
+                    ? Colors.transparent
+                    : LuckifyColors.primary.withValues(alpha: 0.2),
                 width: 1.0,
               ),
             ),
@@ -52,8 +52,12 @@ class LuckifyButton extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (imageName != null)
-              Image.asset(imageName!.path, width: 35, height: 35),
+            if (fortuneType != null)
+              Image.asset(
+                FortuneAssetPath.getImagePath(fortuneType!),
+                width: 35,
+                height: 35,
+              ),
             const SizedBox(width: 8),
             Text(
               buttonText,

@@ -17,7 +17,6 @@ class TodayFortunePromptGenerator implements FortunePromptGenerator {
     # 사랑운 \n 
     # 건강운 \n 
     # 행운의 컬러 \n
-    
     주의사항: 
     - 별자리명과 날짜 범위, 오늘 날짜, 오늘의 운세라는 멘트 작성하지 마세요!
     ''';
