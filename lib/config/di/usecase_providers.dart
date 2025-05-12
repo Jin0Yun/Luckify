@@ -19,12 +19,12 @@ final todayPromptGeneratorProvider = Provider<FortunePromptGenerator>((ref) {
 });
 
 final promptGeneratorsProvider =
-Provider<Map<FortuneType, FortunePromptGenerator>>((ref) {
-  return {
-    FortuneType.zodiacFortune: ref.watch(zodiacPromptGeneratorProvider),
-    FortuneType.fortuneToday: ref.watch(todayPromptGeneratorProvider),
-  };
-});
+    Provider<Map<FortuneType, FortunePromptGenerator>>((ref) {
+      return {
+        FortuneType.zodiacFortune: ref.watch(zodiacPromptGeneratorProvider),
+        FortuneType.fortuneToday: ref.watch(todayPromptGeneratorProvider),
+      };
+    });
 
 final promptResolverProvider = Provider<PromptResolver>((ref) {
   return FortunePromptResolver(ref.watch(promptGeneratorsProvider));
@@ -35,8 +35,8 @@ final contentFormatterProvider = Provider<FortuneContentFormatter>((ref) {
 });
 
 final getFortuneReadingUseCaseProvider = Provider<GetFortuneReadingUseCase>((
-    ref,
-    ) {
+  ref,
+) {
   return GetFortuneReadingUseCase(
     repository: ref.watch(fortuneRepositoryProvider),
     uuidGenerator: ref.watch(uuidGeneratorProvider),
