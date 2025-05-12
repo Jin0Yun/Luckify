@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:luckify/config/di/providers.dart';
 import 'package:luckify/core/theme/luckify_colors.dart';
 import 'package:luckify/core/theme/luckify_text_styles.dart';
-import 'package:luckify/config/di/providers.dart';
 import 'package:luckify/domain/entity/fortune_entity.dart';
 import 'package:luckify/domain/entity/fortune_message_entity.dart';
-import 'package:luckify/domain/entity/message_entity.dart';
-import 'package:luckify/domain/enum/message_sender.dart';
-import 'package:luckify/domain/enum/fortune_type.dart';
 import 'package:luckify/presentation/widget/chat_bubble.dart';
 import 'package:luckify/presentation/widget/chat_input_field.dart';
-import 'package:luckify/core/utils/uuid_generator.dart';
-import 'package:luckify/core/constants/zodiac_constants.dart';
+import 'package:luckify/presentation/viewmodel/fortune_viewmodel.dart';
 
 class FortuneChatScreen extends ConsumerStatefulWidget {
   final FortuneEntity selectedFortune;
@@ -23,215 +19,117 @@ class FortuneChatScreen extends ConsumerStatefulWidget {
 }
 
 class _FortuneChatScreenState extends ConsumerState<FortuneChatScreen> {
-  final List<FortuneMessageEntity> _messages = [];
   final TextEditingController _textController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final FocusNode _focusNode = FocusNode();
-  late final UuidGenerator _uuidGenerator;
-  bool _isLoading = false;
-
-  String _generateId() => _uuidGenerator.generate();
+  late FortuneViewModel _viewModel;
 
   @override
   void initState() {
     super.initState();
-    _uuidGenerator = ref.read(uuidGeneratorProvider);
-
-    _addMessage(
-      FortuneMessageEntity(
-        id: _generateId(),
-        content: widget.selectedFortune.requiresUserInput
-            ? '별자리를 입력해주세요! ✨'
-            : '오늘의 운세를 알려드릴게요! ✨\n잠시만 기다려주세요...',
-        sender: MessageSender.assistant,
-        timestamp: DateTime.now(),
-        fortune: widget.selectedFortune,
-      ),
-    );
-
-    if (!widget.selectedFortune.requiresUserInput) {
-      _getFortuneReading();
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _viewModel = ref.read(
+        fortuneViewModelProvider(widget.selectedFortune).notifier,
+      );
+    });
   }
 
-  void _addMessage(FortuneMessageEntity message) {
-    setState(() {
-      _messages.add(message);
-    });
+  @override
+  void dispose() {
+    _textController.dispose();
+    _scrollController.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  void _scrollToBottom() {
+    if (!_scrollController.hasClients) return;
 
     Future.delayed(const Duration(milliseconds: 100), () {
-      if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOut,
-        );
-      }
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOut,
+      );
     });
   }
 
-  Future<void> _requestFortune({String? userInput}) async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    bool shouldRemoveMessage = false;
-
-    if (userInput != null) {
-      final loadingMessage = FortuneMessageEntity(
-        id: _generateId(),
-        content: "운세를 확인하고 있습니다.\n잠시만 기다려주세요...",
-        sender: MessageSender.assistant,
-        timestamp: DateTime.now(),
-        fortune: widget.selectedFortune,
-      );
-      _addMessage(loadingMessage);
-      shouldRemoveMessage = true;
-    } else {
-      shouldRemoveMessage = true;
-    }
-
-    try {
-      final useCase = ref.read(getFortuneReadingUseCaseProvider);
-
-      final List<MessageEntity> messageHistory = _messages
-          .map((msg) => MessageEntity(
-        id: msg.id,
-        content: msg.content,
-        sender: msg.sender,
-        timestamp: msg.timestamp,
-      ))
-          .toList();
-
-      if (shouldRemoveMessage) {
-        messageHistory.removeLast();
-      }
-
-      final result = await useCase.execute(
-        fortune: widget.selectedFortune,
-        messages: messageHistory,
-        userInput: userInput,
-      );
-
-      if (shouldRemoveMessage) {
-        setState(() {
-          _messages.removeLast();
-        });
-      }
-
-      _addMessage(result);
-    } catch (e) {
-      if (shouldRemoveMessage) {
-        setState(() {
-          _messages.removeLast();
-        });
-      }
-
-      _addMessage(
-        FortuneMessageEntity(
-          id: _generateId(),
-          content: "운세를 확인하는 중 오류가 발생했습니다. 다시 시도해주세요.",
-          sender: MessageSender.assistant,
-          timestamp: DateTime.now(),
-          fortune: widget.selectedFortune,
-        ),
-      );
-
-      debugPrint('API 오류: $e');
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
-
-  Future<void> _getFortuneReading() async {
-    return _requestFortune();
-  }
-
-  Future<void> _sendMessage() async {
+  Future<void> _handleSendMessage() async {
     final text = _textController.text.trim();
     if (text.isEmpty) return;
 
-    final userMessage = FortuneMessageEntity(
-      id: _generateId(),
-      content: text,
-      sender: MessageSender.user,
-      timestamp: DateTime.now(),
-    );
-    _addMessage(userMessage);
     _textController.clear();
-
-    if (widget.selectedFortune.type == FortuneType.zodiacFortune) {
-      final zodiac = ZodiacConstants.findZodiac(text);
-
-      if (zodiac == null) {
-        final errorMessage = FortuneMessageEntity(
-          id: _generateId(),
-          content: "올바른 별자리를 입력해주세요.\n\n"
-              "예시: 양자리, 황소자리, 쌍둥이자리, 게자리 등",
-          sender: MessageSender.assistant,
-          timestamp: DateTime.now(),
-          fortune: widget.selectedFortune,
-        );
-        _addMessage(errorMessage);
-        return;
-      }
-
-      return _requestFortune(userInput: zodiac);
-    }
-
-    return _requestFortune(userInput: text);
+    await _viewModel.sendMessage(text);
   }
 
   @override
   Widget build(BuildContext context) {
+    final state = ref.watch(fortuneViewModelProvider(widget.selectedFortune));
+
+    ref.listen(fortuneViewModelProvider(widget.selectedFortune), (
+        previous,
+        next,
+        ) {
+      if (previous?.messages.length != next.messages.length) {
+        _scrollToBottom();
+      }
+    });
+
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: AppBar(
-        title: Text(
-          widget.selectedFortune.name,
-          style: LuckifyTextStyles.appBarTitle,
-        ),
-        backgroundColor: LuckifyColors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: LuckifyColors.primary),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
+      appBar: _buildAppBar(),
       body: GestureDetector(
         onTap: () => _focusNode.unfocus(),
         child: Column(
           children: [
-            Expanded(
-              child: ListView.builder(
-                controller: _scrollController,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-                itemCount: _messages.length,
-                itemBuilder: (context, index) {
-                  return ChatBubble(
-                    message: _messages[index],
-                    selectedFortune: widget.selectedFortune,
-                  );
-                },
-              ),
-            ),
+            _buildMessageList(state.messages),
             const SizedBox(height: 12),
-            if (widget.selectedFortune.requiresUserInput)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: ChatInputField(
-                  controller: _textController,
-                  focusNode: _focusNode,
-                  onSend: _sendMessage,
-                ),
-              ),
+            if (widget.selectedFortune.requiresUserInput) _buildInputField(state.isLoading),
           ],
         ),
+      ),
+    );
+  }
+
+  AppBar _buildAppBar() {
+    return AppBar(
+      title: Text(
+        widget.selectedFortune.name,
+        style: LuckifyTextStyles.appBarTitle,
+      ),
+      backgroundColor: LuckifyColors.white,
+      elevation: 0,
+      leading: IconButton(
+        icon: Icon(Icons.arrow_back_ios, color: LuckifyColors.primary),
+        onPressed: () => Navigator.pop(context),
+      ),
+    );
+  }
+
+  Widget _buildMessageList(List<FortuneMessageEntity> messages) {
+    return Expanded(
+      child: ListView.builder(
+        controller: _scrollController,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        itemCount: messages.length,
+        itemBuilder: (context, index) {
+          return ChatBubble(
+            message: messages[index],
+            selectedFortune: widget.selectedFortune,
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildInputField(bool isLoading) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: ChatInputField(
+        controller: _textController,
+        focusNode: _focusNode,
+        onSend: _handleSendMessage,
+        isLoading: isLoading,
       ),
     );
   }
