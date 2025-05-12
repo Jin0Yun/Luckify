@@ -22,11 +22,11 @@ class ChatBubble extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return isUser
-        ? _buildUserBubble(context, screenWidth)
-        : _buildBotBubble(context, screenWidth);
+        ? _buildUserBubble(screenWidth)
+        : _buildBotBubble(screenWidth);
   }
 
-  Widget _buildUserBubble(BuildContext context, double screenWidth) {
+  Widget _buildUserBubble(double screenWidth) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
@@ -35,7 +35,7 @@ class ChatBubble extends StatelessWidget {
         children: [
           Text(
             _formatTime(message.timestamp),
-            style: LuckifyTextStyles.timestampText
+            style: LuckifyTextStyles.timestampText,
           ),
           const SizedBox(width: 6),
           Container(
@@ -57,7 +57,7 @@ class ChatBubble extends StatelessWidget {
     );
   }
 
-  Widget _buildBotBubble(BuildContext context, double screenWidth) {
+  Widget _buildBotBubble(double screenWidth) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
@@ -66,7 +66,7 @@ class ChatBubble extends StatelessWidget {
           CircleAvatar(
             radius: 18,
             backgroundImage: AssetImage(
-              FortuneAssetPath.getImagePath(selectedFortune.type),
+              FortuneAssetPath.getImagePathFromEntity(selectedFortune),
             ),
             backgroundColor: LuckifyColors.white,
           ),
@@ -89,7 +89,7 @@ class ChatBubble extends StatelessWidget {
                       vertical: 10,
                     ),
                     decoration: BoxDecoration(
-                      color: LuckifyColors.primary,
+                      color: selectedFortune.primaryColor,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(

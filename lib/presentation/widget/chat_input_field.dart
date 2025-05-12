@@ -6,13 +6,13 @@ class ChatInputField extends StatelessWidget {
   final TextEditingController controller;
   final FocusNode focusNode;
   final VoidCallback onSend;
-  final bool keepKeyboardOpen;
+  final bool isLoading;
 
   const ChatInputField({
     required this.controller,
     required this.focusNode,
     required this.onSend,
-    this.keepKeyboardOpen = false,
+    this.isLoading = false,
     Key? key,
   }) : super(key: key);
 
@@ -26,12 +26,8 @@ class ChatInputField extends StatelessWidget {
             child: TextField(
               controller: controller,
               focusNode: focusNode,
-              onSubmitted: (_) {
-                onSend();
-                if (!keepKeyboardOpen) {
-                  focusNode.unfocus();
-                }
-              },
+              enabled: !isLoading,
+              onSubmitted: (_) => onSend(),
               decoration: InputDecoration(
                 hintText: '메시지를 입력하세요',
                 hintStyle: LuckifyTextStyles.inputHintText,
@@ -49,19 +45,27 @@ class ChatInputField extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           GestureDetector(
-            onTap: () {
-              onSend();
-              if (!keepKeyboardOpen) {
-                focusNode.unfocus();
-              }
-            },
+            onTap: isLoading ? null : onSend,
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: LuckifyColors.primary,
+                color:
+                    isLoading
+                        ? LuckifyColors.primary.withOpacity(0.5)
+                        : LuckifyColors.primary,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.send, color: Colors.white, size: 18),
+              child:
+                  isLoading
+                      ? SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: LuckifyColors.white,
+                        ),
+                      )
+                      : const Icon(Icons.send, color: Colors.white, size: 18),
             ),
           ),
         ],
