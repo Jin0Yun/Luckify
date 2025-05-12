@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:luckify/domain/entity/fortune_entity.dart';
 import 'package:luckify/domain/enum/fortune_type.dart';
 import 'package:luckify/core/theme/luckify_colors.dart';
 import 'package:luckify/core/theme/luckify_text_styles.dart';
@@ -9,17 +10,21 @@ class LuckifyButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final bool isActive;
   final FortuneType? fortuneType;
+  final FortuneEntity? fortune;
 
   const LuckifyButton({
     required this.buttonText,
     this.onPressed,
     this.isActive = false,
     this.fortuneType,
+    this.fortune,
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
+    final primaryColor = fortune?.primaryColor ?? LuckifyColors.primary;
+
     return SizedBox(
       width: double.infinity,
       height: 70,
@@ -27,15 +32,16 @@ class LuckifyButton extends StatelessWidget {
         onPressed: onPressed,
         style: ButtonStyle(
           backgroundColor: WidgetStateProperty.all(
-            isActive ? LuckifyColors.primary : LuckifyColors.white,
+            isActive ? primaryColor : LuckifyColors.white,
           ),
           shape: WidgetStateProperty.all(
             RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
               side: BorderSide(
-                color: isActive
+                color:
+                isActive
                     ? Colors.transparent
-                    : LuckifyColors.primary.withValues(alpha: 0.2),
+                    : primaryColor.withValues(alpha: 0.2),
                 width: 1.0,
               ),
             ),
@@ -52,7 +58,13 @@ class LuckifyButton extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (fortuneType != null)
+            if (fortune != null && fortune!.iconPath.isNotEmpty)
+              Image.asset(
+                fortune!.iconPath,
+                width: 35,
+                height: 35,
+              )
+            else if (fortuneType != null)
               Image.asset(
                 FortuneAssetPath.getImagePath(fortuneType!),
                 width: 35,
