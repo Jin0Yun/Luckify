@@ -12,8 +12,8 @@ final fortuneListViewModelProvider =
       (ref) => FortuneListViewModel(),
     );
 
-final fortuneViewModelProvider =
-    StateNotifierProvider.family<FortuneViewModel, FortuneState, FortuneEntity>(
+final fortuneViewModelProvider = StateNotifierProvider.autoDispose
+    .family<FortuneViewModel, FortuneState, FortuneEntity>(
       (ref, selectedFortune) => FortuneViewModel(
         selectedFortune: selectedFortune,
         getFortuneReadingUseCase: ref.read(getFortuneReadingUseCaseProvider),
