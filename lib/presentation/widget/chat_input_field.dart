@@ -13,8 +13,8 @@ class ChatInputField extends StatelessWidget {
     required this.focusNode,
     required this.onSend,
     this.isLoading = false,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  }) : super();
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +51,7 @@ class ChatInputField extends StatelessWidget {
               decoration: BoxDecoration(
                 color:
                     isLoading
-                        ? LuckifyColors.primary.withOpacity(0.5)
+                        ? LuckifyColors.primary.withValues(alpha: 0.5)
                         : LuckifyColors.primary,
                 shape: BoxShape.circle,
               ),

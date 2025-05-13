@@ -27,7 +27,7 @@ flutter:
 
   assets:
     - assets/images/
-    - .env
+
   fonts:
     - family: Moneygraphy
       fonts:
