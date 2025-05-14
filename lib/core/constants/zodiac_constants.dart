@@ -23,7 +23,7 @@ class ZodiacConstants {
       return normalized;
     }
 
-    final fullName = normalized.endsWith('자리') ? normalized : '${normalized}자리';
+    final fullName = normalized.endsWith('자리') ? normalized : '$normalized자리';
     if (zodiacNames.contains(fullName)) {
       return fullName;
     }

@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:luckify/core/utils/date_formatter.dart';
 import 'package:luckify/presentation/formatters/fortune_content_formatter.dart';
-import 'package:luckify/presentation/formatters/fortune_content_formatterImpl.dart';
+import 'package:luckify/presentation/formatters/fortune_content_formatter_impl.dart';
 import 'package:luckify/presentation/prompt/generators/today_fortune_prompt_generator.dart';
 import 'package:luckify/presentation/prompt/generators/zodiac_fortune_prompt_generator.dart';
 import 'package:luckify/presentation/prompt/generators/fortune_prompt_generator.dart';
