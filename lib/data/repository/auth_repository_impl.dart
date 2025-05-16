@@ -50,7 +50,7 @@ class FirebaseAuthRepository implements AuthRepository {
       _logger.e('Google 로그인 실패', error: e, stackTrace: stackTrace, tag: 'Auth');
 
       if (e is AuthException) {
-        throw e;
+        rethrow;
       }
 
       if (e is firebase_auth.FirebaseAuthException) {
