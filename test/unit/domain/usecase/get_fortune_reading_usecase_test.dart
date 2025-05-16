@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:luckify/core/exceptions/fortune_exception.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:luckify/domain/usecase/get_fortune_reading_usecase.dart';
@@ -8,7 +9,6 @@ import 'package:luckify/presentation/formatters/fortune_content_formatter.dart';
 import 'package:luckify/presentation/prompt/resolvers/prompt_resolver.dart';
 import 'package:luckify/domain/enum/fortune_type.dart';
 import 'package:luckify/domain/enum/message_sender.dart';
-import 'package:luckify/core/exceptions/fortune_exception.dart';
 import '../../../mocks/get_fortune_reading_usecase_test.mocks.dart';
 import '../../../builders/object_builders.dart';
 import '../../core/constants/test_constants.dart';
@@ -158,12 +158,12 @@ void main() {
 
       // When & Then
       expect(
-        () => useCase.execute(fortune: ObjectBuilders.fortune(), messages: []),
+            () => useCase.execute(fortune: ObjectBuilders.fortune(), messages: []),
         throwsA(
           isA<FortuneException>().having(
-            (e) => e.message,
-            'message',
-            contains('운세 응답에 선택지가 없습니다'),
+                (e) => e.type,
+            'type',
+            FortuneError.emptyChoices,
           ),
         ),
       );
@@ -178,12 +178,12 @@ void main() {
 
       // When & Then
       expect(
-        () => useCase.execute(fortune: ObjectBuilders.fortune(), messages: []),
+            () => useCase.execute(fortune: ObjectBuilders.fortune(), messages: []),
         throwsA(
           isA<FortuneException>().having(
-            (e) => e.message,
-            'message',
-            contains('운세 조회 중 오류가 발생했습니다'),
+                (e) => e.type,
+            'type',
+            FortuneError.unknown,
           ),
         ),
       );

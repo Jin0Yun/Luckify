@@ -1,3 +1,5 @@
+import 'package:luckify/core/exceptions/fortune_exception.dart';
+import 'package:luckify/core/exceptions/network_error.dart';
 import 'package:luckify/data/network/network_client_interface.dart';
 import 'package:luckify/data/api/open_ai_chat_api.dart';
 import 'package:luckify/data/dto/response_dto.dart';
@@ -22,16 +24,23 @@ class FortuneRepositoryImpl implements FortuneRepository {
 
   @override
   Future<ResponseEntity> fetchFortuneFromAPI(RequestEntity request) async {
-    final api = OpenAIChatApi(
-      request: requestMapper.toDTO(request),
-      apiKey: apiKey,
-    );
+    try {
+      final api = OpenAIChatApi(
+        request: requestMapper.toDTO(request),
+        apiKey: apiKey,
+      );
 
-    final responseDTO = await networkClient.send<ResponseDTO>(
-      api: api,
-      fromJson: ResponseDTO.fromJson,
-    );
+      final responseDTO = await networkClient.send<ResponseDTO>(
+        api: api,
+        fromJson: ResponseDTO.fromJson,
+      );
 
-    return responseMapper.toEntity(responseDTO);
+      return responseMapper.toEntity(responseDTO);
+    } catch (e) {
+      if (e is NetworkException) {
+        throw FortuneException(FortuneError.networkError, e);
+      }
+      throw FortuneException(FortuneError.unknown, e is Exception ? e : null);
+    }
   }
 }
