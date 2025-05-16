@@ -29,6 +29,10 @@ jobs:
       - name: Create empty .env file for CI
         run: touch .env
 
+      - name: Create Firebase options file
+        run: |
+          echo "${{ secrets.FIREBASE_OPTIONS }}" > lib/firebase_options.dart
+
       - name: Analyze code
         run: flutter analyze
 
@@ -51,6 +55,10 @@ jobs:
       - name: Create empty .env file for CI
         run: touch .env
 
+      - name: Create Firebase options file
+        run: |
+          echo "${{ secrets.FIREBASE_OPTIONS }}" > lib/firebase_options.dart
+
       - name: Run tests
         run: flutter test
 
@@ -72,6 +80,10 @@ jobs:
 
       - name: Create empty .env file for CI
         run: touch .env
+
+      - name: Create Firebase options file
+        run: |
+          echo "${{ secrets.FIREBASE_OPTIONS }}" > lib/firebase_options.dart
 
       - name: Build APK
         run: flutter build apk --release
@@ -100,6 +112,10 @@ jobs:
 
       - name: Create empty .env file for CI
         run: touch .env
+
+      - name: Create Firebase options file
+        run: |
+          echo "${{ secrets.FIREBASE_OPTIONS }}" > lib/firebase_options.dart
 
       - name: Build iOS
         run: flutter build ios --release --no-codesign
