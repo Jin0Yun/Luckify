@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:luckify/firebase_options.dart';
-import 'package:luckify/presentation/screen/home_screen.dart';
 import 'package:luckify/core/theme/luckify_colors.dart';
 import 'package:luckify/presentation/screen/login_screen.dart';
+import 'package:luckify/presentation/screen/main_screen.dart';
 import 'config/di/viewmodel_providers.dart';
 
 Future<void> main() async {
@@ -32,7 +32,7 @@ class MyApp extends ConsumerWidget {
         primaryColor: LuckifyColors.primary,
         fontFamily: 'Moneygraphy',
       ),
-      home: authState.isLoggedIn ? const HomeScreen() : const LoginScreen(),
+      home: authState.isLoggedIn ? const MainScreen() : const LoginScreen(),
     );
   }
 }
