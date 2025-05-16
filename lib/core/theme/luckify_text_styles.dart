@@ -73,6 +73,6 @@ class LuckifyTextStyles {
 
   static final navLabel = _base.copyWith(
     fontSize: 12,
-    color: LuckifyColors.grey.withOpacity(0.6),
+    color: LuckifyColors.grey.withValues(alpha: 0.6),
   );
 }
