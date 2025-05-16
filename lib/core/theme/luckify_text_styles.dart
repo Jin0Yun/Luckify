@@ -52,4 +52,22 @@ class LuckifyTextStyles {
     fontSize: 11,
     color: LuckifyColors.grey,
   );
+
+  static final loginTitle = _base.copyWith(
+    fontSize: 40,
+    fontWeight: FontWeight.bold,
+    color: LuckifyColors.white,
+  );
+
+  static final loginSubtitle = _base.copyWith(
+    fontSize: 16,
+    fontWeight: FontWeight.w300,
+    color: LuckifyColors.white,
+  );
+
+  static final errorText = _base.copyWith(
+    fontSize: 14,
+    fontWeight: FontWeight.w400,
+    color: Colors.red[700],
+  );
 }

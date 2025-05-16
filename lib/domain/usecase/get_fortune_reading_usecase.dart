@@ -59,7 +59,7 @@ class GetFortuneReadingUseCase {
       final responseEntity = await _repository.fetchFortuneFromAPI(updatedRequest);
 
       if (responseEntity.choices.isEmpty) {
-        throw const FortuneException('운세 응답에 선택지가 없습니다.');
+        throw FortuneException(FortuneError.emptyChoices);
       }
 
       final messageContent = responseEntity.choices.first.message.content;
@@ -74,7 +74,10 @@ class GetFortuneReadingUseCase {
         userInput: userInput,
       );
     } catch (e) {
-      throw FortuneException('운세 조회 중 오류가 발생했습니다: $e');
+      if (e is FortuneException) {
+        rethrow;
+      }
+      throw FortuneException(FortuneError.unknown, e is Exception ? e : null);
     }
   }
 }
