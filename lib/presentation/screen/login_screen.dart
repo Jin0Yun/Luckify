@@ -7,7 +7,7 @@ import 'package:luckify/core/theme/luckify_text_styles.dart';
 import 'package:luckify/presentation/screen/home_screen.dart';
 
 class LoginScreen extends ConsumerWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -110,7 +110,7 @@ class LoginScreen extends ConsumerWidget {
                       child: Text(
                         authState.error!,
                         style: LuckifyTextStyles.errorText.copyWith(
-                          color: LuckifyColors.errorRed.withOpacity(0.9),
+                          color: LuckifyColors.errorRed.withValues(alpha: 0.9),
                         ),
                         textAlign: TextAlign.center,
                       ),

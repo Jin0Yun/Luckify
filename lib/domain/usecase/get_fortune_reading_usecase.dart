@@ -75,7 +75,7 @@ class GetFortuneReadingUseCase {
       );
     } catch (e) {
       if (e is FortuneException) {
-        throw e;
+        rethrow;
       }
       throw FortuneException(FortuneError.unknown, e is Exception ? e : null);
     }

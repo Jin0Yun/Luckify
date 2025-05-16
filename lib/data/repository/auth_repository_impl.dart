@@ -21,12 +21,10 @@ class FirebaseAuthRepository implements AuthRepository {
 
   @override
   Future<UserEntity> signInWithProvider(AuthProvider provider) async {
-    switch (provider) {
-      case AuthProvider.google:
-        return _signInWithGoogle();
-      default:
-        throw AuthException(AuthError.operationNotAllowed);
+    if (provider == AuthProvider.google) {
+      return _signInWithGoogle();
     }
+    throw AuthException(AuthError.operationNotAllowed);
   }
 
   Future<UserEntity> _signInWithGoogle() async {
