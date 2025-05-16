@@ -1,7 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:luckify/config/di/core_providers.dart';
+import 'package:luckify/config/di/repository_providers.dart';
 import 'package:luckify/config/di/usecase_providers.dart';
 import 'package:luckify/domain/entity/fortune_entity.dart';
+import 'package:luckify/presentation/viewmodel/auth_state.dart';
+import 'package:luckify/presentation/viewmodel/auth_view_model.dart';
 import 'package:luckify/presentation/viewmodel/fortune_list_state.dart';
 import 'package:luckify/presentation/viewmodel/fortune_list_view_model.dart';
 import 'package:luckify/presentation/viewmodel/fortune_state.dart';
@@ -20,3 +23,9 @@ final fortuneViewModelProvider = StateNotifierProvider.autoDispose
         uuidGenerator: ref.read(uuidGeneratorProvider),
       ),
     );
+
+final authViewModelProvider = StateNotifierProvider<AuthViewModel, AuthState>((
+  ref,
+) {
+  return AuthViewModel(authRepository: ref.read(authRepositoryProvider));
+});
