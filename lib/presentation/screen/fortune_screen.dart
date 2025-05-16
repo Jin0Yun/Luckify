@@ -8,19 +8,14 @@ import 'package:luckify/presentation/screen/fortune_chat_screen.dart';
 import 'package:luckify/presentation/viewmodel/fortune_list_view_model.dart';
 import 'package:luckify/presentation/widget/luckify_button.dart';
 
-class HomeScreen extends ConsumerWidget {
-  const HomeScreen({super.key});
+class FortuneScreen extends ConsumerWidget {
+  const FortuneScreen({super.key});
 
-  void _navigateToFortuneChat(BuildContext context, WidgetRef ref) {
-    final selectedFortune =
-        ref.read(fortuneListViewModelProvider).selectedFortune;
-    if (selectedFortune == null) return;
-
+  void _navigateToFortuneChat(BuildContext context, FortuneEntity fortune) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder:
-            (context) => FortuneChatScreen(selectedFortune: selectedFortune),
+        builder: (context) => FortuneChatScreen(selectedFortune: fortune),
       ),
     );
   }
@@ -31,27 +26,16 @@ class HomeScreen extends ConsumerWidget {
     final viewModel = ref.read(fortuneListViewModelProvider.notifier);
     final Size screenSize = MediaQuery.of(context).size;
 
-    return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SizedBox(height: screenSize.height * 0.1),
-              _buildHeader(),
-              SizedBox(height: screenSize.height * 0.05),
-              _buildFortuneList(
-                state.fortunes,
-                state.selectedFortune,
-                viewModel,
-              ),
-              if (state.selectedFortune != null)
-                _buildSelectButton(context, ref),
-            ],
-          ),
-        ),
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        SizedBox(height: screenSize.height * 0.05),
+        _buildHeader(),
+        SizedBox(height: screenSize.height * 0.05),
+        _buildFortuneList(context, state.fortunes, viewModel),
+        const Spacer(flex: 1),
+        SizedBox(height: screenSize.height * 0.05),
+      ],
     );
   }
 
@@ -65,7 +49,7 @@ class HomeScreen extends ConsumerWidget {
             UITextConstants.homeScreenTitle,
             style: LuckifyTextStyles.fortuneTitle,
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           Text(
             UITextConstants.homeScreenSubtitle,
             style: LuckifyTextStyles.fortuneSubtitle,
@@ -76,35 +60,31 @@ class HomeScreen extends ConsumerWidget {
   }
 
   Widget _buildFortuneList(
+    BuildContext context,
     List<FortuneEntity> fortunes,
-    FortuneEntity? selectedFortune,
     FortuneListViewModel viewModel,
   ) {
-    return Expanded(
+    return Container(
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.35,
+      ),
       child: ListView.separated(
-        physics: const BouncingScrollPhysics(),
+        physics: const NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
         itemCount: fortunes.length,
-        separatorBuilder: (context, index) => const SizedBox(height: 18),
+        separatorBuilder: (context, index) => const SizedBox(height: 16),
         itemBuilder: (context, index) {
           final fortune = fortunes[index];
           return LuckifyButton(
             buttonText: fortune.name,
-            isActive: selectedFortune?.id == fortune.id,
+            isActive: false,
             fortuneType: fortune.type,
-            onPressed: () => viewModel.selectFortune(fortune),
+            onPressed: () {
+              viewModel.selectFortune(fortune);
+              _navigateToFortuneChat(context, fortune);
+            },
           );
         },
-      ),
-    );
-  }
-
-  Widget _buildSelectButton(BuildContext context, WidgetRef ref) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
-      child: LuckifyButton(
-        buttonText: UITextConstants.selectButtonText,
-        isActive: true,
-        onPressed: () => _navigateToFortuneChat(context, ref),
       ),
     );
   }

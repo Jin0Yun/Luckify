@@ -4,7 +4,7 @@ import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:luckify/config/di/providers.dart';
 import 'package:luckify/core/theme/luckify_colors.dart';
 import 'package:luckify/core/theme/luckify_text_styles.dart';
-import 'package:luckify/presentation/screen/home_screen.dart';
+import 'package:luckify/presentation/screen/fortune_screen.dart';
 
 class LoginScreen extends ConsumerWidget {
   const LoginScreen({super.key});
@@ -16,7 +16,7 @@ class LoginScreen extends ConsumerWidget {
     if (authState.isLoggedIn) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const HomeScreen()),
+          MaterialPageRoute(builder: (_) => const FortuneScreen()),
         );
       });
     }
@@ -27,10 +27,7 @@ class LoginScreen extends ConsumerWidget {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              LuckifyColors.primary,
-              LuckifyColors.primaryDark,
-            ],
+            colors: [LuckifyColors.primary, LuckifyColors.primaryDark],
           ),
         ),
         child: SafeArea(
@@ -78,7 +75,9 @@ class LoginScreen extends ConsumerWidget {
                   const SizedBox(height: 50),
                   if (authState.isLoading)
                     const CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(LuckifyColors.white),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        LuckifyColors.white,
+                      ),
                     )
                   else
                     Container(
@@ -96,9 +95,14 @@ class LoginScreen extends ConsumerWidget {
                         Buttons.Google,
                         text: "Google로 로그인",
                         onPressed: () {
-                          ref.read(authViewModelProvider.notifier).signInWithGoogle();
+                          ref
+                              .read(authViewModelProvider.notifier)
+                              .signInWithGoogle();
                         },
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:luckify/core/theme/luckify_colors.dart';
 import 'package:luckify/core/theme/luckify_text_styles.dart';
-import 'package:luckify/presentation/screen/home_screen.dart';
+import 'package:luckify/presentation/screen/fortune_screen.dart';
 
 class MainScreen extends ConsumerStatefulWidget {
   const MainScreen({super.key});
@@ -36,7 +36,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 22.0),
         child: IndexedStack(
           index: _currentIndex,
-          children: [const HomeScreen(), _buildHistoryScreen()],
+          children: [const FortuneScreen(), _buildHistoryScreen()],
         ),
       ),
       bottomNavigationBar: Container(
@@ -97,23 +97,14 @@ class _MainScreenState extends ConsumerState<MainScreen> {
       icon: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Padding(
-            padding: _navIconPadding,
-            child: Icon(iconData),
-          ),
-          Container(
-            height: 3,
-            color: Colors.transparent,
-          ),
+          Padding(padding: _navIconPadding, child: Icon(iconData)),
+          Container(height: 3, color: Colors.transparent),
         ],
       ),
       activeIcon: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Padding(
-            padding: _navIconPadding,
-            child: Icon(iconData, size: 28),
-          ),
+          Padding(padding: _navIconPadding, child: Icon(iconData, size: 28)),
         ],
       ),
       label: label,
