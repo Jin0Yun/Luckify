@@ -114,7 +114,7 @@ class LoginScreen extends ConsumerWidget {
                       child: Text(
                         authState.error!,
                         style: LuckifyTextStyles.errorText.copyWith(
-                          color: LuckifyColors.errorRed.withValues(alpha: 0.9),
+                          color: LuckifyColors.error.withValues(alpha: 0.9),
                         ),
                         textAlign: TextAlign.center,
                       ),

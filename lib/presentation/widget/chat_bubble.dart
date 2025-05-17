@@ -42,7 +42,7 @@ class ChatBubble extends StatelessWidget {
             constraints: BoxConstraints(maxWidth: screenWidth * 0.7),
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
-              color: LuckifyColors.surfaceSubtle,
+              color: LuckifyColors.surface,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
