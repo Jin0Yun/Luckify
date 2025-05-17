@@ -13,6 +13,12 @@ class LuckifyTextStyles {
     color: LuckifyColors.primary,
   );
 
+  static final fortuneTitleSmall = _base.copyWith(
+    fontWeight: FontWeight.w700,
+    fontSize: 18,
+    color: LuckifyColors.primary,
+  );
+
   static final fortuneSubtitle = _base.copyWith(
     fontWeight: FontWeight.w200,
     fontSize: 13,
@@ -74,5 +80,50 @@ class LuckifyTextStyles {
   static final navLabel = _base.copyWith(
     fontSize: 12,
     color: LuckifyColors.grey.withValues(alpha: 0.6),
+  );
+
+  static final sectionTitle = _base.copyWith(
+    fontSize: 17,
+    fontWeight: FontWeight.w600,
+  );
+
+  static final profileItemText = buttonText.copyWith(
+    fontWeight: FontWeight.w200,
+    fontSize: 14,
+  );
+
+  static final profileItemTextDestructive = buttonText.copyWith(
+    fontWeight: FontWeight.w200,
+    fontSize: 14,
+    color: LuckifyColors.error,
+  );
+
+  static final avatarInitial = _base.copyWith(
+    fontSize: 40,
+    color: LuckifyColors.white,
+    fontWeight: FontWeight.bold,
+  );
+
+  static final alertTitle = _base.copyWith(
+    fontWeight: FontWeight.w500,
+    fontSize: 18,
+  );
+
+  static final alertContent = _base.copyWith(
+    fontWeight: FontWeight.w300,
+    fontSize: 13,
+    color: LuckifyColors.alertNeutralTextColor,
+  );
+
+  static final alertCancelButton = _base.copyWith(
+    fontWeight: FontWeight.w400,
+    fontSize: 14,
+    color: LuckifyColors.alertCancelButtonText,
+  );
+
+  static final alertConfirmButton = _base.copyWith(
+    fontWeight: FontWeight.w500,
+    fontSize: 16,
+    color: LuckifyColors.white,
   );
 }
