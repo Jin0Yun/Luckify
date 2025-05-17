@@ -4,7 +4,7 @@ import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:luckify/config/di/providers.dart';
 import 'package:luckify/core/theme/luckify_colors.dart';
 import 'package:luckify/core/theme/luckify_text_styles.dart';
-import 'package:luckify/presentation/screen/fortune_screen.dart';
+import 'package:luckify/presentation/screen/main_screen.dart';
 
 class LoginScreen extends ConsumerWidget {
   const LoginScreen({super.key});
@@ -16,7 +16,7 @@ class LoginScreen extends ConsumerWidget {
     if (authState.isLoggedIn) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const FortuneScreen()),
+          MaterialPageRoute(builder: (_) => const MainScreen()),
         );
       });
     }
