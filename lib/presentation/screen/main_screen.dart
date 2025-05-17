@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:luckify/core/theme/luckify_colors.dart';
 import 'package:luckify/core/theme/luckify_text_styles.dart';
 import 'package:luckify/presentation/screen/fortune_screen.dart';
+import 'package:luckify/presentation/screen/profile_screen.dart';
 
 class MainScreen extends ConsumerStatefulWidget {
   const MainScreen({super.key});
@@ -30,7 +31,13 @@ class _MainScreenState extends ConsumerState<MainScreen> {
         foregroundColor: LuckifyColors.primary,
         elevation: 0,
         automaticallyImplyLeading: false,
-        actions: [IconButton(icon: const Icon(Icons.person), onPressed: () {})],
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.person, size: 28),
+            padding: const EdgeInsets.all(16.0),
+            onPressed: () => _navigateToProfileScreen(context),
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 22.0),
@@ -124,4 +131,11 @@ class _MainScreenState extends ConsumerState<MainScreen> {
       ),
     );
   }
+}
+
+void _navigateToProfileScreen(BuildContext context) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => const ProfileScreen()),
+  );
 }
