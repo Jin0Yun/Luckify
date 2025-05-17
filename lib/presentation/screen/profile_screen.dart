@@ -76,7 +76,7 @@ class ProfileScreen extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: 16),
-        Container(
+        SizedBox(
           width: double.infinity,
           child: Stack(
             alignment: Alignment.center,
@@ -218,14 +218,15 @@ class ProfileScreen extends ConsumerWidget {
           isDestructive: false,
           barrierDismissible: true,
         )
-        .then((confirmed) {
+        .then((confirmed) async {
           if (confirmed == true) {
-            authViewModel.signOut().then((_) {
+            await authViewModel.signOut();
+            if (context.mounted) {
               Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(builder: (context) => const LoginScreen()),
                 (route) => false,
               );
-            });
+            }
           }
         });
   }
