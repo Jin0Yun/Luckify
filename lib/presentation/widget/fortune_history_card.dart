@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:luckify/core/theme/luckify_colors.dart';
 import 'package:luckify/core/theme/luckify_text_styles.dart';
 import 'package:luckify/domain/entity/fortune_entity.dart';
 import 'package:luckify/presentation/util/fortune_asset_path.dart';
@@ -19,43 +20,69 @@ class FortuneHistoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final primaryColor = fortune.primaryColor;
+
     return Card(
-      elevation: 0,
-      color: Colors.white,
+      elevation: 2,
+      shadowColor: LuckifyColors.alertOverlay,
+      color: LuckifyColors.white,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: Colors.grey.withValues(alpha: 0.3), width: 1),
+        borderRadius: BorderRadius.circular(10),
+        side: BorderSide(
+          color: primaryColor.withValues(alpha: 0.2),
+          width: 1.0,
+        ),
       ),
       child: InkWell(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(10),
         onTap: onPressed,
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Row(
-                children: [
-                  Image.asset(
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: primaryColor.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Image.asset(
                     FortuneAssetPath.getImagePathFromEntity(fortune),
-                    width: 25,
-                    height: 25,
+                    width: 35,
+                    height: 35,
                   ),
-                  const SizedBox(width: 8),
-                  Text(fortune.name, style: LuckifyTextStyles.fortuneCardSubtitle),
-                  const Spacer(),
-                  Text(
-                    timestamp,
-                    style: LuckifyTextStyles.fortuneCardTimestamp,
-                  ),
-                ],
+                ),
               ),
-              const SizedBox(height: 12),
-              Text(
-                subtitle,
-                style: LuckifyTextStyles.fortuneCardContent,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          fortune.name,
+                          style: LuckifyTextStyles.fortuneCardSubtitle,
+                        ),
+                        Text(
+                          timestamp,
+                          style: LuckifyTextStyles.fortuneCardTimestamp,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: LuckifyTextStyles.fortuneCardContent,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
