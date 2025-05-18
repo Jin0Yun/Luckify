@@ -126,4 +126,46 @@ class LuckifyTextStyles {
     fontSize: 16,
     color: LuckifyColors.white,
   );
+
+  static final fortuneCardSubtitle = _base.copyWith(
+    fontWeight: FontWeight.w400,
+    fontSize: 14,
+  );
+
+  static final fortuneCardContent = _base.copyWith(
+    fontSize: 13,
+    fontWeight: FontWeight.w200,
+    color: LuckifyColors.grey,
+    overflow: TextOverflow.ellipsis,
+  );
+
+  static final fortuneCardTimestamp = _base.copyWith(
+    fontSize: 12,
+    fontWeight: FontWeight.w300,
+    color: LuckifyColors.grey,
+  );
+
+  static final tabButtonText = _base.copyWith(
+    fontSize: 13,
+    fontWeight: FontWeight.normal,
+    color: LuckifyColors.grey,
+  );
+
+  static final tabButtonTextSelected = _base.copyWith(
+    fontSize: 13,
+    fontWeight: FontWeight.bold,
+    color: LuckifyColors.white,
+  );
+
+  static final emptyStateTitle = _base.copyWith(
+    fontSize: 18,
+    fontWeight: FontWeight.w500,
+    color: LuckifyColors.primary,
+  );
+
+  static final emptyStateSubtitle = _base.copyWith(
+    fontSize: 14,
+    fontWeight: FontWeight.normal,
+    color: LuckifyColors.grey,
+  );
 }

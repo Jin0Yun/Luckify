@@ -10,6 +10,7 @@ class LuckifyColors {
   static const Color grey = Color(0xFF8E8E93);
   static const Color black = Color(0xFF1C1C1E);
   static const Color error = Color(0xFFFF3B30);
+  static const Color transparent = Color(0x00000000);
 
   static const Color alertOverlay = Color(0x80000000);
   static const Color alertCancelButtonBg = Color(0xFFEDEDED);

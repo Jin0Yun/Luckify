@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:luckify/core/theme/luckify_colors.dart';
 import 'package:luckify/core/theme/luckify_text_styles.dart';
 import 'package:luckify/presentation/screen/fortune_screen.dart';
+import 'package:luckify/presentation/screen/my_fortune_screen.dart';
 import 'package:luckify/presentation/screen/profile_screen.dart';
 
 class MainScreen extends ConsumerStatefulWidget {
@@ -22,7 +23,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          _currentIndex == 0 ? '' : '히스토리',
+          _currentIndex == 0 ? '' : '나의운세',
           style: LuckifyTextStyles.appBarTitle.copyWith(
             color: LuckifyColors.primary,
           ),
@@ -43,7 +44,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 22.0),
         child: IndexedStack(
           index: _currentIndex,
-          children: [const FortuneScreen(), _buildHistoryScreen()],
+          children: [const FortuneScreen(), const MyFortuneScreen()],
         ),
       ),
       bottomNavigationBar: Container(
@@ -91,7 +92,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
             elevation: 0,
             items: [
               _buildNavItem(Icons.auto_awesome, '운세'),
-              _buildNavItem(Icons.history, '히스토리'),
+              _buildNavItem(Icons.history, '나의운세'),
             ],
           ),
         ),
@@ -115,20 +116,6 @@ class _MainScreenState extends ConsumerState<MainScreen> {
         ],
       ),
       label: label,
-    );
-  }
-
-  Widget _buildHistoryScreen() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            '히스토리 화면 (준비 중...)',
-            style: LuckifyTextStyles.navLabel.copyWith(fontSize: 18),
-          ),
-        ],
-      ),
     );
   }
 }
