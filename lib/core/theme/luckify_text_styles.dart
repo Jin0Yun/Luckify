@@ -128,14 +128,15 @@ class LuckifyTextStyles {
   );
 
   static final fortuneCardSubtitle = _base.copyWith(
-    fontWeight: FontWeight.w300,
+    fontWeight: FontWeight.w400,
     fontSize: 14,
-    color: LuckifyColors.grey,
   );
 
   static final fortuneCardContent = _base.copyWith(
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: FontWeight.w200,
+    color: LuckifyColors.grey,
+    overflow: TextOverflow.ellipsis,
   );
 
   static final fortuneCardTimestamp = _base.copyWith(
