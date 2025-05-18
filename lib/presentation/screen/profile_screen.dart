@@ -61,17 +61,14 @@ class ProfileScreen extends ConsumerWidget {
         Center(
           child: CircleAvatar(
             radius: 50,
-            backgroundColor: LuckifyColors.primaryDark,
+            backgroundColor: LuckifyColors.primary,
             backgroundImage:
                 authState.user.photoURL != null
                     ? NetworkImage(authState.user.photoURL.toString())
                     : null,
             child:
                 authState.user.photoURL == null
-                    ? Text(
-                      displayName.isNotEmpty ? displayName[0] : '?',
-                      style: LuckifyTextStyles.avatarInitial,
-                    )
+                    ? Icon(Icons.person, size: 50, color: LuckifyColors.white)
                     : null,
           ),
         ),
