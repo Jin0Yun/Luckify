@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:luckify/core/theme/luckify_text_styles.dart';
 import 'package:luckify/firebase_options.dart';
 import 'package:luckify/core/theme/luckify_colors.dart';
 import 'package:luckify/presentation/screen/login_screen.dart';
@@ -31,6 +32,14 @@ class MyApp extends ConsumerWidget {
         scaffoldBackgroundColor: LuckifyColors.white,
         primaryColor: LuckifyColors.primary,
         fontFamily: 'Moneygraphy',
+        appBarTheme: AppBarTheme(
+          backgroundColor: LuckifyColors.white,
+          foregroundColor: LuckifyColors.primary,
+          elevation: 0,
+          scrolledUnderElevation: 0,
+          surfaceTintColor: LuckifyColors.transparent,
+          titleTextStyle: LuckifyTextStyles.appBarTitle,
+        ),
       ),
       home: authState.isLoggedIn ? const MainScreen() : const LoginScreen(),
     );
