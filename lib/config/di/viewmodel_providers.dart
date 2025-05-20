@@ -12,7 +12,8 @@ import 'package:luckify/presentation/viewmodel/fortune_viewmodel.dart';
 
 final fortuneListViewModelProvider =
     StateNotifierProvider<FortuneListViewModel, FortuneListState>(
-      (ref) => FortuneListViewModel(),
+      (ref) =>
+          FortuneListViewModel(repository: ref.read(fortuneRepositoryProvider)),
     );
 
 final fortuneViewModelProvider = StateNotifierProvider.autoDispose
