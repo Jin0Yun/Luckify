@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:luckify/config/di/viewmodel_providers.dart';
+import 'package:luckify/core/constants/fortune_constants.dart';
 import 'package:luckify/core/theme/luckify_colors.dart';
 import 'package:luckify/core/theme/luckify_text_styles.dart';
 import 'package:luckify/domain/entity/fortune_history_entity.dart';
@@ -59,11 +60,26 @@ class _MyFortuneScreenState extends ConsumerState<MyFortuneScreen>
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          _buildTabButton('전체', 0, selectedTabIndex, viewModel),
+          _buildTabButton(
+            FortuneConstants.allTabTitle,
+            0,
+            selectedTabIndex,
+            viewModel,
+          ),
           const SizedBox(width: 8),
-          _buildTabButton('오늘의 운세', 1, selectedTabIndex, viewModel),
+          _buildTabButton(
+            FortuneConstants.todayFortuneTabTitle,
+            1,
+            selectedTabIndex,
+            viewModel,
+          ),
           const SizedBox(width: 8),
-          _buildTabButton('별자리 운세', 2, selectedTabIndex, viewModel),
+          _buildTabButton(
+            FortuneConstants.zodiacFortuneTabTitle,
+            2,
+            selectedTabIndex,
+            viewModel,
+          ),
         ],
       ),
     );
@@ -142,8 +158,10 @@ class _MyFortuneScreenState extends ConsumerState<MyFortuneScreen>
               context,
               MaterialPageRoute(
                 builder:
-                    (context) =>
-                        FortuneChatScreen(selectedFortune: history.fortune),
+                    (context) => FortuneChatScreen(
+                      selectedFortune: history.fortune,
+                      historyId: history.id,
+                    ),
               ),
             );
           },

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:luckify/config/di/viewmodel_providers.dart';
+import 'package:luckify/core/constants/ui_text_constants.dart';
 import 'package:luckify/core/theme/luckify_colors.dart';
 import 'package:luckify/core/theme/luckify_text_styles.dart';
 import 'package:luckify/presentation/screen/fortune_screen.dart';
@@ -32,7 +33,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          _currentIndex == 0 ? '' : '나의운세',
+          _currentIndex == 0 ? '' : UITextConstants.myFortuneTitle,
           style: LuckifyTextStyles.appBarTitle.copyWith(
             color: LuckifyColors.primary,
           ),
@@ -105,8 +106,8 @@ class _MainScreenState extends ConsumerState<MainScreen> {
             type: BottomNavigationBarType.fixed,
             elevation: 0,
             items: [
-              _buildNavItem(Icons.auto_awesome, '운세'),
-              _buildNavItem(Icons.history, '나의운세'),
+              _buildNavItem(Icons.auto_awesome, UITextConstants.fortuneTitle),
+              _buildNavItem(Icons.history, UITextConstants.myFortuneTitle),
             ],
           ),
         ),

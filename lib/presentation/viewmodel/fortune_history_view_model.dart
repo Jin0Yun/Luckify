@@ -1,3 +1,4 @@
+import 'package:luckify/core/constants/ui_text_constants.dart';
 import 'package:luckify/core/utils/date_formatter.dart';
 import 'package:luckify/domain/entity/empty_state_message.dart';
 import 'package:luckify/domain/entity/fortune_history_entity.dart';
@@ -81,11 +82,20 @@ class FortuneHistoryViewModel extends BaseViewModel<FortuneHistoryState> {
   EmptyStateMessage getEmptyStateMessage() {
     switch (state.selectedTabIndex) {
       case 1:
-        return EmptyStateMessage('오늘의 운세 기록이 없어요', '운세 탭에서 오늘의 운세를 확인해보세요');
+        return EmptyStateMessage(
+          UITextConstants.emptyTodayMessage,
+          UITextConstants.emptyTodaySubMessage,
+        );
       case 2:
-        return EmptyStateMessage('별자리 운세 기록이 없어요', '운세 탭에서 별자리 운세를 확인해보세요');
+        return EmptyStateMessage(
+          UITextConstants.emptyZodiacMessage,
+          UITextConstants.emptyZodiacSubMessage,
+        );
       default:
-        return EmptyStateMessage('아직 본 운세가 없어요', '운세 탭에서 다양한 운세를 확인해보세요');
+        return EmptyStateMessage(
+          UITextConstants.emptyAllMessage,
+          UITextConstants.emptyAllSubMessage,
+        );
     }
   }
 
