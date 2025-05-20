@@ -1,5 +1,6 @@
 import 'package:luckify/core/constants/message_constants.dart';
 import 'package:luckify/domain/entity/fortune_entity.dart';
+import 'package:luckify/domain/entity/fortune_history_entity.dart';
 import 'package:luckify/domain/entity/fortune_message_entity.dart';
 import 'package:luckify/domain/entity/message_entity.dart';
 import 'package:luckify/domain/enum/message_sender.dart';
@@ -7,6 +8,7 @@ import 'package:luckify/domain/enum/fortune_type.dart';
 import 'package:luckify/domain/usecase/get_fortune_reading_usecase.dart';
 import 'package:luckify/core/utils/uuid_generator.dart';
 import 'package:luckify/core/constants/zodiac_constants.dart';
+import 'package:luckify/domain/repository/fortune_history_repository.dart';
 import 'package:luckify/presentation/viewmodel/base_view_model.dart';
 import 'package:luckify/presentation/viewmodel/fortune_message_state.dart';
 
@@ -14,13 +16,16 @@ class FortuneMessageViewModel extends BaseViewModel<FortuneMessageState> {
   final FortuneEntity selectedFortune;
   final GetFortuneReadingUseCase _getFortuneReadingUseCase;
   final UuidGenerator _uuidGenerator;
+  final FortuneHistoryRepository _historyRepository;
 
   FortuneMessageViewModel({
     required this.selectedFortune,
     required GetFortuneReadingUseCase getFortuneReadingUseCase,
     required UuidGenerator uuidGenerator,
+    required FortuneHistoryRepository historyRepository,
   }) : _getFortuneReadingUseCase = getFortuneReadingUseCase,
        _uuidGenerator = uuidGenerator,
+       _historyRepository = historyRepository,
        super(const FortuneMessageState()) {
     _initialize();
   }
@@ -80,6 +85,21 @@ class FortuneMessageViewModel extends BaseViewModel<FortuneMessageState> {
     addMessage(errorMessage);
   }
 
+  Future<void> _saveToHistory(FortuneMessageEntity message) async {
+    if (!message.content.contains(MessageConstants.waitingText) &&
+        message.sender == MessageSender.assistant) {
+      await _historyRepository.saveFortuneHistory(
+        FortuneHistoryEntity(
+          id: _uuidGenerator.generate(),
+          fortune: selectedFortune,
+          content: message.content,
+          timestamp: DateTime.now(),
+          userInput: message.userInput,
+        ),
+      );
+    }
+  }
+
   Future<void> _requestWithLoading(
     Future<FortuneMessageEntity> Function() action,
     String loadingContent,
@@ -97,6 +117,7 @@ class FortuneMessageViewModel extends BaseViewModel<FortuneMessageState> {
       final result = await runWithLoading(action);
       removeMessage(loadingMessage.id);
       addMessage(result);
+      await _saveToHistory(result);
     } catch (e) {
       _handleError(loadingMessage.id);
     }
@@ -186,5 +207,6 @@ class FortuneMessageViewModel extends BaseViewModel<FortuneMessageState> {
 
     return requestFortune(userInput: text);
   }
+
   List<FortuneMessageEntity> get messages => state.messages;
 }
