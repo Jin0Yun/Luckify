@@ -8,20 +8,20 @@ import 'package:luckify/domain/usecase/get_fortune_reading_usecase.dart';
 import 'package:luckify/core/utils/uuid_generator.dart';
 import 'package:luckify/core/constants/zodiac_constants.dart';
 import 'package:luckify/presentation/viewmodel/base_view_model.dart';
-import 'package:luckify/presentation/viewmodel/fortune_state.dart';
+import 'package:luckify/presentation/viewmodel/fortune_message_state.dart';
 
-class FortuneViewModel extends BaseViewModel<FortuneState> {
+class FortuneMessageViewModel extends BaseViewModel<FortuneMessageState> {
   final FortuneEntity selectedFortune;
   final GetFortuneReadingUseCase _getFortuneReadingUseCase;
   final UuidGenerator _uuidGenerator;
 
-  FortuneViewModel({
+  FortuneMessageViewModel({
     required this.selectedFortune,
     required GetFortuneReadingUseCase getFortuneReadingUseCase,
     required UuidGenerator uuidGenerator,
   }) : _getFortuneReadingUseCase = getFortuneReadingUseCase,
        _uuidGenerator = uuidGenerator,
-       super(const FortuneState()) {
+       super(const FortuneMessageState()) {
     _initialize();
   }
 
@@ -41,17 +41,17 @@ class FortuneViewModel extends BaseViewModel<FortuneState> {
   }
 
   @override
-  FortuneState setLoadingState(bool isLoading) {
+  FortuneMessageState setLoadingState(bool isLoading) {
     return state.copyWith(isLoading: isLoading);
   }
 
   @override
-  FortuneState setErrorState(String? error) {
+  FortuneMessageState setErrorState(String? error) {
     return state.copyWith(error: error);
   }
 
   @override
-  FortuneState clearErrorState() {
+  FortuneMessageState clearErrorState() {
     return state.copyWith(error: null);
   }
 
