@@ -35,6 +35,7 @@ class FortuneHistoryViewModel extends BaseViewModel<FortuneHistoryState> {
   Future<void> loadHistories() async {
     await runWithLoading(() async {
       final histories = await _repository.getFortuneHistories();
+      histories.sort((a, b) => b.timestamp.compareTo(a.timestamp));
       state = state.copyWith(histories: histories);
     });
   }
@@ -45,6 +46,7 @@ class FortuneHistoryViewModel extends BaseViewModel<FortuneHistoryState> {
           type == null
               ? await _repository.getFortuneHistories()
               : await _repository.getFortuneHistoriesByType(type);
+      histories.sort((a, b) => b.timestamp.compareTo(a.timestamp));
       state = state.copyWith(histories: histories);
     });
   }
