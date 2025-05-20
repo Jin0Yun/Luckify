@@ -44,6 +44,14 @@ class FortuneHistoryRepositoryImpl implements FortuneHistoryRepository {
   }
 
   @override
+  Future<FortuneHistoryEntity?> getFortuneHistoryById(String id) async {
+    return _wrapException(() async {
+      final histories = await getFortuneHistories();
+      return histories.firstWhere((h) => h.id == id);
+    });
+  }
+
+  @override
   Future<void> saveFortuneHistory(FortuneHistoryEntity history) async {
     return _wrapException(() async {
       final String? historyJson = _prefs.getString(_historyKey);
