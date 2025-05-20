@@ -1,8 +1,11 @@
 import 'package:luckify/domain/entity/fortune_message_entity.dart';
+import 'package:luckify/presentation/viewmodel/base_state.dart';
 
-class FortuneState {
+class FortuneState implements BaseState {
   final List<FortuneMessageEntity> messages;
+  @override
   final bool isLoading;
+  @override
   final String? error;
 
   const FortuneState({
