@@ -8,6 +8,7 @@ import 'package:luckify/domain/entity/fortune_history_entity.dart';
 import 'package:luckify/presentation/screen/fortune_chat_screen.dart';
 import 'package:luckify/presentation/viewmodel/fortune_history_view_model.dart';
 import 'package:luckify/presentation/widget/fortune_history_card.dart';
+import 'package:luckify/presentation/widget/luckify_alert_service.dart';
 
 class MyFortuneScreen extends ConsumerStatefulWidget {
   const MyFortuneScreen({super.key});
@@ -146,27 +147,59 @@ class _MyFortuneScreenState extends ConsumerState<MyFortuneScreen>
       separatorBuilder: (context, index) => const SizedBox(height: 8),
       itemBuilder: (context, index) {
         final history = histories[index];
-        return FortuneHistoryCard(
-          fortune: history.fortune,
-          subtitle:
-              history.content.length > 80
-                  ? '${history.content.substring(0, 80)}...'
-                  : history.content,
-          timestamp: viewModel.formatTimestamp(history.timestamp),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder:
-                    (context) => FortuneChatScreen(
-                      selectedFortune: history.fortune,
-                      historyId: history.id,
-                    ),
-              ),
-            );
-          },
+
+        return Dismissible(
+          key: Key(history.id),
+          background: Container(
+            color: LuckifyColors.error,
+            alignment: Alignment.centerRight,
+            padding: const EdgeInsets.only(right: 20.0),
+            child: const Icon(Icons.delete, color: LuckifyColors.white),
+          ),
+          direction: DismissDirection.endToStart,
+          confirmDismiss:
+              (direction) =>
+                  _showDeleteConfirmation(context, history.id, viewModel),
+          child: FortuneHistoryCard(
+            fortune: history.fortune,
+            subtitle: history.content,
+            timestamp: viewModel.formatTimestamp(history.timestamp),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder:
+                      (context) => FortuneChatScreen(
+                        selectedFortune: history.fortune,
+                        historyId: history.id,
+                      ),
+                ),
+              );
+            },
+          ),
         );
       },
     );
+  }
+
+  Future<bool> _showDeleteConfirmation(
+    BuildContext context,
+    String historyId,
+    FortuneHistoryViewModel viewModel,
+  ) async {
+    final result = await LuckifyAlertService().showAlert(
+      context: context,
+      title: '운세 기록 삭제',
+      content: '이 운세 기록을 삭제하시겠습니까?',
+      cancelText: '취소',
+      confirmText: '삭제',
+      isDestructive: true,
+    );
+
+    if (result == true) {
+      await viewModel.deleteHistory(historyId);
+      return true;
+    }
+    return false;
   }
 }
