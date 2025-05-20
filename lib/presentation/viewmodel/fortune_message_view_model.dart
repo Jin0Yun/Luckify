@@ -66,6 +66,7 @@ class FortuneMessageViewModel extends BaseViewModel<FortuneMessageState> {
   }
 
   void removeMessage(String messageId) {
+    if (!mounted) return;
     final updatedMessages =
         state.messages.where((msg) => msg.id != messageId).toList();
 
@@ -115,10 +116,12 @@ class FortuneMessageViewModel extends BaseViewModel<FortuneMessageState> {
 
     try {
       final result = await runWithLoading(action);
+      if (!mounted) return;
       removeMessage(loadingMessage.id);
       addMessage(result);
       await _saveToHistory(result);
     } catch (e) {
+      if (!mounted) return;
       _handleError(loadingMessage.id);
     }
   }
