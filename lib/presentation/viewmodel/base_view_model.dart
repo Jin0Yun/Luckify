@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:luckify/presentation/viewmodel/base_state.dart';
 
 abstract class BaseViewModel<T extends BaseState> extends StateNotifier<T> {
-  BaseViewModel(T initialState) : super(initialState);
+  BaseViewModel(super.initialState);
 
   T setLoadingState(bool isLoading);
   T setErrorState(String? error);
