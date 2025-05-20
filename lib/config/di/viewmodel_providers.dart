@@ -5,6 +5,8 @@ import 'package:luckify/config/di/usecase_providers.dart';
 import 'package:luckify/domain/entity/fortune_entity.dart';
 import 'package:luckify/presentation/viewmodel/auth_state.dart';
 import 'package:luckify/presentation/viewmodel/auth_view_model.dart';
+import 'package:luckify/presentation/viewmodel/fortune_history_state.dart';
+import 'package:luckify/presentation/viewmodel/fortune_history_view_model.dart';
 import 'package:luckify/presentation/viewmodel/fortune_list_state.dart';
 import 'package:luckify/presentation/viewmodel/fortune_list_view_model.dart';
 import 'package:luckify/presentation/viewmodel/fortune_message_state.dart';
@@ -22,6 +24,15 @@ final fortuneViewModelProvider = StateNotifierProvider.autoDispose
         selectedFortune: selectedFortune,
         getFortuneReadingUseCase: ref.read(getFortuneReadingUseCaseProvider),
         uuidGenerator: ref.read(uuidGeneratorProvider),
+        historyRepository: ref.read(fortuneHistoryRepositoryProvider),
+      ),
+    );
+
+final fortuneHistoryViewModelProvider =
+    StateNotifierProvider<FortuneHistoryViewModel, FortuneHistoryState>(
+      (ref) => FortuneHistoryViewModel(
+        repository: ref.read(fortuneHistoryRepositoryProvider),
+        dateFormatter: ref.read(dateFormatterProvider),
       ),
     );
 

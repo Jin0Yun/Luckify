@@ -8,9 +8,12 @@ import 'package:luckify/data/mapper/message_mapper.dart';
 import 'package:luckify/data/mapper/request_mapper.dart';
 import 'package:luckify/data/mapper/response_mapper.dart';
 import 'package:luckify/data/repository/auth_repository_impl.dart';
+import 'package:luckify/data/repository/fortune_history_repository_impl.dart';
 import 'package:luckify/data/repository/fortune_repository_impl.dart';
 import 'package:luckify/domain/repository/auth_repository.dart';
+import 'package:luckify/domain/repository/fortune_history_repository.dart';
 import 'package:luckify/domain/repository/fortune_repository.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final messageMapperProvider = Provider<MessageMapper>((ref) => MessageMapper());
 
@@ -40,4 +43,14 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
     firebaseAuth: FirebaseAuth.instance,
     googleSignIn: GoogleSignIn(),
   );
+});
+
+final sharedPrefsProvider = Provider<SharedPreferences>((ref) {
+  throw UnimplementedError('Initialize this in main.dart');
+});
+
+final fortuneHistoryRepositoryProvider = Provider<FortuneHistoryRepository>((
+  ref,
+) {
+  return FortuneHistoryRepositoryImpl(prefs: ref.watch(sharedPrefsProvider));
 });
