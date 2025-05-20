@@ -1,4 +1,3 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:luckify/core/constants/message_constants.dart';
 import 'package:luckify/domain/entity/fortune_entity.dart';
 import 'package:luckify/domain/entity/fortune_message_entity.dart';
@@ -8,9 +7,10 @@ import 'package:luckify/domain/enum/fortune_type.dart';
 import 'package:luckify/domain/usecase/get_fortune_reading_usecase.dart';
 import 'package:luckify/core/utils/uuid_generator.dart';
 import 'package:luckify/core/constants/zodiac_constants.dart';
+import 'package:luckify/presentation/viewmodel/base_view_model.dart';
 import 'package:luckify/presentation/viewmodel/fortune_state.dart';
 
-class FortuneViewModel extends StateNotifier<FortuneState> {
+class FortuneViewModel extends BaseViewModel<FortuneState> {
   final FortuneEntity selectedFortune;
   final GetFortuneReadingUseCase _getFortuneReadingUseCase;
   final UuidGenerator _uuidGenerator;
@@ -40,6 +40,21 @@ class FortuneViewModel extends StateNotifier<FortuneState> {
     }
   }
 
+  @override
+  FortuneState setLoadingState(bool isLoading) {
+    return state.copyWith(isLoading: isLoading);
+  }
+
+  @override
+  FortuneState setErrorState(String? error) {
+    return state.copyWith(error: error);
+  }
+
+  @override
+  FortuneState clearErrorState() {
+    return state.copyWith(error: null);
+  }
+
   void addMessage(FortuneMessageEntity message) {
     final updatedMessages = [...state.messages, message];
     state = state.copyWith(messages: updatedMessages);
@@ -52,12 +67,23 @@ class FortuneViewModel extends StateNotifier<FortuneState> {
     state = state.copyWith(messages: updatedMessages);
   }
 
+  void _handleError(String loadingMessageId) {
+    removeMessage(loadingMessageId);
+
+    final errorMessage = FortuneMessageEntity(
+      id: _uuidGenerator.generate(),
+      content: MessageConstants.errorMessage,
+      sender: MessageSender.assistant,
+      timestamp: DateTime.now(),
+      fortune: selectedFortune,
+    );
+    addMessage(errorMessage);
+  }
+
   Future<void> _requestWithLoading(
     Future<FortuneMessageEntity> Function() action,
     String loadingContent,
   ) async {
-    state = state.copyWith(isLoading: true, error: null);
-
     final loadingMessage = FortuneMessageEntity(
       id: _uuidGenerator.generate(),
       content: loadingContent,
@@ -68,24 +94,11 @@ class FortuneViewModel extends StateNotifier<FortuneState> {
     addMessage(loadingMessage);
 
     try {
-      final result = await action();
+      final result = await runWithLoading(action);
       removeMessage(loadingMessage.id);
       addMessage(result);
     } catch (e) {
-      removeMessage(loadingMessage.id);
-
-      final errorMessage = FortuneMessageEntity(
-        id: _uuidGenerator.generate(),
-        content: MessageConstants.errorMessage,
-        sender: MessageSender.assistant,
-        timestamp: DateTime.now(),
-        fortune: selectedFortune,
-      );
-      addMessage(errorMessage);
-
-      state = state.copyWith(error: e.toString());
-    } finally {
-      state = state.copyWith(isLoading: false);
+      _handleError(loadingMessage.id);
     }
   }
 
@@ -173,14 +186,5 @@ class FortuneViewModel extends StateNotifier<FortuneState> {
 
     return requestFortune(userInput: text);
   }
-
-  void resetError() {
-    state = state.copyWith(error: null);
-  }
-
-  bool get isLoading => state.isLoading;
-
   List<FortuneMessageEntity> get messages => state.messages;
-
-  String? get errorMessage => state.error;
 }
