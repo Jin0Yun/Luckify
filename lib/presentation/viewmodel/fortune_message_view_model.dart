@@ -1,6 +1,6 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:luckify/core/constants/message_constants.dart';
 import 'package:luckify/domain/entity/fortune_entity.dart';
+import 'package:luckify/domain/entity/fortune_history_entity.dart';
 import 'package:luckify/domain/entity/fortune_message_entity.dart';
 import 'package:luckify/domain/entity/message_entity.dart';
 import 'package:luckify/domain/enum/message_sender.dart';
@@ -8,24 +8,31 @@ import 'package:luckify/domain/enum/fortune_type.dart';
 import 'package:luckify/domain/usecase/get_fortune_reading_usecase.dart';
 import 'package:luckify/core/utils/uuid_generator.dart';
 import 'package:luckify/core/constants/zodiac_constants.dart';
-import 'package:luckify/presentation/viewmodel/fortune_state.dart';
+import 'package:luckify/domain/repository/fortune_history_repository.dart';
+import 'package:luckify/presentation/viewmodel/base_view_model.dart';
+import 'package:luckify/presentation/viewmodel/fortune_message_state.dart';
 
-class FortuneViewModel extends StateNotifier<FortuneState> {
+class FortuneMessageViewModel extends BaseViewModel<FortuneMessageState> {
   final FortuneEntity selectedFortune;
   final GetFortuneReadingUseCase _getFortuneReadingUseCase;
   final UuidGenerator _uuidGenerator;
+  final FortuneHistoryRepository _historyRepository;
+  bool _isInitialized = false;
 
-  FortuneViewModel({
+  FortuneMessageViewModel({
     required this.selectedFortune,
     required GetFortuneReadingUseCase getFortuneReadingUseCase,
     required UuidGenerator uuidGenerator,
+    required FortuneHistoryRepository historyRepository,
   }) : _getFortuneReadingUseCase = getFortuneReadingUseCase,
        _uuidGenerator = uuidGenerator,
-       super(const FortuneState()) {
-    _initialize();
-  }
+       _historyRepository = historyRepository,
+       super(const FortuneMessageState());
 
-  void _initialize() {
+  void initialize() {
+    if (_isInitialized) return;
+    _isInitialized = true;
+
     if (selectedFortune.requiresUserInput) {
       final initialMessage = FortuneMessageEntity(
         id: _uuidGenerator.generate(),
@@ -40,24 +47,67 @@ class FortuneViewModel extends StateNotifier<FortuneState> {
     }
   }
 
+  @override
+  FortuneMessageState setLoadingState(bool isLoading) {
+    return state.copyWith(isLoading: isLoading);
+  }
+
+  @override
+  FortuneMessageState setErrorState(String? error) {
+    return state.copyWith(error: error);
+  }
+
+  @override
+  FortuneMessageState clearErrorState() {
+    return state.copyWith(error: null);
+  }
+
   void addMessage(FortuneMessageEntity message) {
     final updatedMessages = [...state.messages, message];
     state = state.copyWith(messages: updatedMessages);
   }
 
   void removeMessage(String messageId) {
+    if (!mounted) return;
     final updatedMessages =
         state.messages.where((msg) => msg.id != messageId).toList();
 
     state = state.copyWith(messages: updatedMessages);
   }
 
+  void _handleError(String loadingMessageId) {
+    removeMessage(loadingMessageId);
+
+    final errorMessage = FortuneMessageEntity(
+      id: _uuidGenerator.generate(),
+      content: MessageConstants.errorMessage,
+      sender: MessageSender.assistant,
+      timestamp: DateTime.now(),
+      fortune: selectedFortune,
+    );
+    addMessage(errorMessage);
+  }
+
+  Future<void> _saveToHistory(FortuneMessageEntity message) async {
+    if (!message.content.contains(MessageConstants.waitingText) &&
+        message.sender == MessageSender.assistant) {
+      await _historyRepository.saveFortuneHistory(
+        FortuneHistoryEntity(
+          id: _uuidGenerator.generate(),
+          fortune: selectedFortune,
+          content: message.content,
+          timestamp: DateTime.now(),
+          userInput: message.userInput,
+        ),
+      );
+    }
+  }
+
   Future<void> _requestWithLoading(
     Future<FortuneMessageEntity> Function() action,
-    String loadingContent,
-  ) async {
-    state = state.copyWith(isLoading: true, error: null);
-
+    String loadingContent, {
+    bool saveToHistory = true,
+  }) async {
     final loadingMessage = FortuneMessageEntity(
       id: _uuidGenerator.generate(),
       content: loadingContent,
@@ -68,24 +118,16 @@ class FortuneViewModel extends StateNotifier<FortuneState> {
     addMessage(loadingMessage);
 
     try {
-      final result = await action();
+      final result = await runWithLoading(action);
+      if (!mounted) return;
       removeMessage(loadingMessage.id);
       addMessage(result);
+      if (saveToHistory) {
+        await _saveToHistory(result);
+      }
     } catch (e) {
-      removeMessage(loadingMessage.id);
-
-      final errorMessage = FortuneMessageEntity(
-        id: _uuidGenerator.generate(),
-        content: MessageConstants.errorMessage,
-        sender: MessageSender.assistant,
-        timestamp: DateTime.now(),
-        fortune: selectedFortune,
-      );
-      addMessage(errorMessage);
-
-      state = state.copyWith(error: e.toString());
-    } finally {
-      state = state.copyWith(isLoading: false);
+      if (!mounted) return;
+      _handleError(loadingMessage.id);
     }
   }
 
@@ -127,19 +169,8 @@ class FortuneViewModel extends StateNotifier<FortuneState> {
 
   Future<void> getFortuneReading() async {
     state = state.copyWith(messages: []);
-
-    if (selectedFortune.requiresUserInput) {
-      final initialMessage = FortuneMessageEntity(
-        id: _uuidGenerator.generate(),
-        content: MessageConstants.zodiacPrompt,
-        sender: MessageSender.assistant,
-        timestamp: DateTime.now(),
-        fortune: selectedFortune,
-      );
-      addMessage(initialMessage);
-    } else {
-      return _requestFortuneDirectly();
-    }
+    _isInitialized = false;
+    initialize();
   }
 
   Future<void> sendMessage(String text) async {
@@ -174,13 +205,51 @@ class FortuneViewModel extends StateNotifier<FortuneState> {
     return requestFortune(userInput: text);
   }
 
-  void resetError() {
-    state = state.copyWith(error: null);
+  Future<void> loadChatHistory(String historyId) async {
+    state = state.copyWith(messages: []);
+    _isInitialized = true;
+
+    await _requestWithLoading(
+      () async {
+        final history = await _historyRepository.getFortuneHistoryById(
+          historyId,
+        );
+        if (history == null) throw Exception('History not found');
+
+        if (selectedFortune.requiresUserInput && history.userInput != null) {
+          final promptMessage = FortuneMessageEntity(
+            id: _uuidGenerator.generate(),
+            content: MessageConstants.zodiacPrompt,
+            sender: MessageSender.assistant,
+            timestamp: history.timestamp.subtract(const Duration(minutes: 2)),
+            fortune: selectedFortune,
+          );
+          addMessage(promptMessage);
+
+          final userMessage = FortuneMessageEntity(
+            id: _uuidGenerator.generate(),
+            content: history.userInput!,
+            sender: MessageSender.user,
+            timestamp: history.timestamp.subtract(const Duration(minutes: 1)),
+          );
+          addMessage(userMessage);
+        }
+
+        final responseMessage = FortuneMessageEntity(
+          id: _uuidGenerator.generate(),
+          content: history.content,
+          sender: MessageSender.assistant,
+          timestamp: history.timestamp,
+          fortune: selectedFortune,
+          userInput: history.userInput,
+        );
+
+        return responseMessage;
+      },
+      MessageConstants.loadingHistory,
+      saveToHistory: false,
+    );
   }
 
-  bool get isLoading => state.isLoading;
-
   List<FortuneMessageEntity> get messages => state.messages;
-
-  String? get errorMessage => state.error;
 }

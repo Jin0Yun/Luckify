@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:luckify/config/di/viewmodel_providers.dart';
+import 'package:luckify/core/constants/ui_text_constants.dart';
 import 'package:luckify/core/theme/luckify_colors.dart';
 import 'package:luckify/core/theme/luckify_text_styles.dart';
 import 'package:luckify/presentation/screen/fortune_screen.dart';
@@ -19,85 +21,111 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   static const EdgeInsets _navIconPadding = EdgeInsets.only(bottom: 4, top: 6);
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(fortuneHistoryViewModelProvider.notifier).loadHistories();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          _currentIndex == 0 ? '' : '나의운세',
-          style: LuckifyTextStyles.appBarTitle.copyWith(
-            color: LuckifyColors.primary,
-          ),
+      appBar: _buildAppBar(),
+      body: _buildBody(),
+      bottomNavigationBar: _buildBottomNavigationBar(),
+    );
+  }
+
+  AppBar _buildAppBar() {
+    return AppBar(
+      title: Text(
+        _currentIndex == 0 ? '' : UITextConstants.myFortuneTitle,
+        style: LuckifyTextStyles.appBarTitle.copyWith(
+          color: LuckifyColors.primary,
         ),
-        backgroundColor: LuckifyColors.white,
-        foregroundColor: LuckifyColors.primary,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.person, size: 28),
-            padding: const EdgeInsets.all(16.0),
-            onPressed: () => _navigateToProfileScreen(context),
+      ),
+      backgroundColor: LuckifyColors.white,
+      foregroundColor: LuckifyColors.primary,
+      elevation: 0,
+      automaticallyImplyLeading: false,
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.person, size: 28),
+          padding: const EdgeInsets.all(16.0),
+          onPressed: _navigateToProfileScreen,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBody() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 22.0),
+      child: IndexedStack(
+        index: _currentIndex,
+        children: const [FortuneScreen(), MyFortuneScreen()],
+      ),
+    );
+  }
+
+  Widget _buildBottomNavigationBar() {
+    return Container(
+      decoration: BoxDecoration(
+        color: LuckifyColors.white,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(22),
+          topRight: Radius.circular(22),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: LuckifyColors.primary.withValues(alpha: 0.08),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
           ),
         ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 22.0),
-        child: IndexedStack(
-          index: _currentIndex,
-          children: [const FortuneScreen(), const MyFortuneScreen()],
+        border: Border(
+          top: BorderSide(
+            color: LuckifyColors.primary.withValues(alpha: 0.1),
+            width: 1,
+          ),
         ),
       ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: LuckifyColors.white,
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(22),
-            topRight: Radius.circular(22),
+      child: ClipRRect(
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(16),
+          topRight: Radius.circular(16),
+        ),
+        child: BottomNavigationBar(
+          currentIndex: _currentIndex,
+          onTap: _onTabTapped,
+          backgroundColor: LuckifyColors.white,
+          selectedItemColor: LuckifyColors.primary,
+          unselectedItemColor: LuckifyColors.grey.withValues(alpha: 0.6),
+          selectedLabelStyle: LuckifyTextStyles.navLabel.copyWith(
+            fontWeight: FontWeight.w600,
+            color: LuckifyColors.primary,
           ),
-          boxShadow: [
-            BoxShadow(
-              color: LuckifyColors.primary.withValues(alpha: 0.08),
-              blurRadius: 10,
-              offset: const Offset(0, -2),
-            ),
+          unselectedLabelStyle: LuckifyTextStyles.navLabel,
+          type: BottomNavigationBarType.fixed,
+          elevation: 0,
+          items: [
+            _buildNavItem(Icons.auto_awesome, UITextConstants.fortuneTitle),
+            _buildNavItem(Icons.history, UITextConstants.myFortuneTitle),
           ],
-          border: Border(
-            top: BorderSide(
-              color: LuckifyColors.primary.withValues(alpha: 0.1),
-              width: 1,
-            ),
-          ),
-        ),
-        child: ClipRRect(
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(16),
-            topRight: Radius.circular(16),
-          ),
-          child: BottomNavigationBar(
-            currentIndex: _currentIndex,
-            onTap: (index) {
-              setState(() {
-                _currentIndex = index;
-              });
-            },
-            backgroundColor: LuckifyColors.white,
-            selectedItemColor: LuckifyColors.primary,
-            unselectedItemColor: LuckifyColors.grey.withValues(alpha: 0.6),
-            selectedLabelStyle: LuckifyTextStyles.navLabel.copyWith(
-              fontWeight: FontWeight.w600,
-              color: LuckifyColors.primary,
-            ),
-            unselectedLabelStyle: LuckifyTextStyles.navLabel,
-            type: BottomNavigationBarType.fixed,
-            elevation: 0,
-            items: [
-              _buildNavItem(Icons.auto_awesome, '운세'),
-              _buildNavItem(Icons.history, '나의운세'),
-            ],
-          ),
         ),
       ),
     );
+  }
+
+  void _onTabTapped(int index) {
+    if (index == 1 && _currentIndex != index) {
+      ref.read(fortuneHistoryViewModelProvider.notifier).loadHistories();
+      ref.read(fortuneHistoryViewModelProvider.notifier).setSelectedTabIndex(0);
+    }
+    setState(() {
+      _currentIndex = index;
+    });
   }
 
   BottomNavigationBarItem _buildNavItem(IconData iconData, String label) {
@@ -118,11 +146,11 @@ class _MainScreenState extends ConsumerState<MainScreen> {
       label: label,
     );
   }
-}
 
-void _navigateToProfileScreen(BuildContext context) {
-  Navigator.push(
-    context,
-    MaterialPageRoute(builder: (context) => const ProfileScreen()),
-  );
+  void _navigateToProfileScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const ProfileScreen()),
+    );
+  }
 }

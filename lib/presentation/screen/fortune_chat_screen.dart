@@ -7,12 +7,16 @@ import 'package:luckify/domain/entity/fortune_entity.dart';
 import 'package:luckify/domain/entity/fortune_message_entity.dart';
 import 'package:luckify/presentation/widget/chat_bubble.dart';
 import 'package:luckify/presentation/widget/chat_input_field.dart';
-import 'package:luckify/presentation/viewmodel/fortune_viewmodel.dart';
 
 class FortuneChatScreen extends ConsumerStatefulWidget {
   final FortuneEntity selectedFortune;
+  final String? historyId;
 
-  const FortuneChatScreen({super.key, required this.selectedFortune});
+  const FortuneChatScreen({
+    super.key,
+    required this.selectedFortune,
+    this.historyId,
+  });
 
   @override
   ConsumerState<FortuneChatScreen> createState() => _FortuneChatScreenState();
@@ -22,15 +26,19 @@ class _FortuneChatScreenState extends ConsumerState<FortuneChatScreen> {
   final TextEditingController _textController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final FocusNode _focusNode = FocusNode();
-  late FortuneViewModel _viewModel;
 
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _viewModel = ref.read(
-        fortuneViewModelProvider(widget.selectedFortune).notifier,
-      );
+      if (widget.historyId != null) {
+        _loadHistoryChat(widget.historyId!);
+      } else {
+        ref
+            .read(fortuneViewModelProvider(widget.selectedFortune).notifier)
+            .initialize();
+      }
     });
   }
 
@@ -40,6 +48,12 @@ class _FortuneChatScreenState extends ConsumerState<FortuneChatScreen> {
     _scrollController.dispose();
     _focusNode.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadHistoryChat(String historyId) async {
+    await ref
+        .read(fortuneViewModelProvider(widget.selectedFortune).notifier)
+        .loadChatHistory(historyId);
   }
 
   void _scrollToBottom() {
@@ -59,7 +73,9 @@ class _FortuneChatScreenState extends ConsumerState<FortuneChatScreen> {
     if (text.isEmpty) return;
 
     _textController.clear();
-    await _viewModel.sendMessage(text);
+    await ref
+        .read(fortuneViewModelProvider(widget.selectedFortune).notifier)
+        .sendMessage(text);
   }
 
   @override
@@ -67,9 +83,9 @@ class _FortuneChatScreenState extends ConsumerState<FortuneChatScreen> {
     final state = ref.watch(fortuneViewModelProvider(widget.selectedFortune));
 
     ref.listen(fortuneViewModelProvider(widget.selectedFortune), (
-        previous,
-        next,
-        ) {
+      previous,
+      next,
+    ) {
       if (previous?.messages.length != next.messages.length) {
         _scrollToBottom();
       }
@@ -84,7 +100,9 @@ class _FortuneChatScreenState extends ConsumerState<FortuneChatScreen> {
           children: [
             _buildMessageList(state.messages),
             const SizedBox(height: 12),
-            if (widget.selectedFortune.requiresUserInput) _buildInputField(state.isLoading),
+            if (widget.selectedFortune.requiresUserInput &&
+                widget.historyId == null)
+              _buildInputField(state.isLoading),
           ],
         ),
       ),
