@@ -1,6 +1,5 @@
 import 'package:luckify/core/exceptions/fortune_exception.dart';
 import 'package:luckify/core/exceptions/network_error.dart';
-import 'package:luckify/core/logger/logger.dart';
 import 'package:luckify/data/network/network_client_interface.dart';
 import 'package:luckify/data/api/open_ai_chat_api.dart';
 import 'package:luckify/data/dto/response_dto.dart';
