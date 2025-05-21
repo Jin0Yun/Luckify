@@ -113,7 +113,7 @@ class FortuneHistoryRepositoryImpl extends BaseRepository
           );
         }
       },
-      '단일 운세 기록 조회',
+      '운세 기록 상세 조회',
       additionalInfo: id,
     );
   }
