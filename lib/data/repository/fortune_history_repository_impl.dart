@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:luckify/core/exceptions/fortune_exception.dart';
-import 'package:luckify/core/logger/logger.dart';
 import 'package:luckify/data/repository/base_repository.dart';
 import 'package:luckify/domain/entity/fortune_entity.dart';
 import 'package:luckify/domain/entity/fortune_history_entity.dart';
@@ -17,10 +16,10 @@ class FortuneHistoryRepositoryImpl extends BaseRepository
   FortuneHistoryRepositoryImpl({
     required FirebaseFirestore firestore,
     String? userId,
-    AppLogger? logger,
+    super.logger,
   }) : _firestore = firestore,
        _userId = userId,
-       super(logger: logger, tag: 'FortuneHistory');
+       super(tag: 'FortuneHistory');
 
   CollectionReference<Map<String, dynamic>> get _collection {
     if (_userId != null) {

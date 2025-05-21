@@ -23,8 +23,8 @@ class FortuneRepositoryImpl extends BaseRepository
     required this.requestMapper,
     required this.responseMapper,
     required this.apiKey,
-    AppLogger? logger,
-  }) : super(logger: logger, tag: 'Fortune');
+    super.logger,
+  }) : super(tag: 'Fortune');
 
   FortuneException _mapNetworkException(NetworkException e) {
     switch (e.type) {

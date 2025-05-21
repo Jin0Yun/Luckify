@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:luckify/core/exceptions/auth_error.dart';
-import 'package:luckify/core/logger/logger.dart';
 import 'package:luckify/data/repository/base_repository.dart';
 import 'package:luckify/domain/entity/user_entity.dart';
 import 'package:luckify/domain/repository/auth_repository.dart';
@@ -13,10 +12,10 @@ class FirebaseAuthRepository extends BaseRepository implements AuthRepository {
   FirebaseAuthRepository({
     firebase_auth.FirebaseAuth? firebaseAuth,
     GoogleSignIn? googleSignIn,
-    AppLogger? logger,
+    super.logger,
   }) : _firebaseAuth = firebaseAuth ?? firebase_auth.FirebaseAuth.instance,
        _googleSignIn = googleSignIn ?? GoogleSignIn(),
-       super(logger: logger, tag: 'Auth');
+       super(tag: 'Auth');
 
   AuthException _mapFirebaseAuthException(
     firebase_auth.FirebaseAuthException e,
