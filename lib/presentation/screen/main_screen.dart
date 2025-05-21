@@ -99,10 +99,18 @@ class MainScreen extends ConsumerWidget {
         ),
         child: BottomNavigationBar(
           currentIndex: currentIndex,
-          onTap:
-              (index) => ref
-                  .read(mainTabViewModelProvider.notifier)
-                  .setTabIndex(index),
+          onTap: (index) {
+            ref.read(mainTabViewModelProvider.notifier).setTabIndex(index);
+            if (index == 1) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                Future(() {
+                  ref
+                      .read(fortuneHistoryViewModelProvider.notifier)
+                      .loadHistories();
+                });
+              });
+            }
+          },
           backgroundColor: LuckifyColors.white,
           selectedItemColor: LuckifyColors.primary,
           unselectedItemColor: LuckifyColors.grey.withValues(alpha: 0.6),
