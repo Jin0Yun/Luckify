@@ -8,12 +8,16 @@ class FortuneHistoryState implements BaseState {
   final bool isLoading;
   @override
   final String? error;
+  final bool isRequestInProgress;
+  final bool isInitialized;
 
   const FortuneHistoryState({
     this.histories = const [],
     this.selectedTabIndex = 0,
     this.isLoading = false,
     this.error,
+    this.isRequestInProgress = false,
+    this.isInitialized = false,
   });
 
   FortuneHistoryState copyWith({
@@ -21,12 +25,16 @@ class FortuneHistoryState implements BaseState {
     int? selectedTabIndex,
     bool? isLoading,
     String? error,
+    bool? isRequestInProgress,
+    bool? isInitialized,
   }) {
     return FortuneHistoryState(
       histories: histories ?? this.histories,
       selectedTabIndex: selectedTabIndex ?? this.selectedTabIndex,
       isLoading: isLoading ?? this.isLoading,
       error: error ?? this.error,
+      isRequestInProgress: isRequestInProgress ?? this.isRequestInProgress,
+      isInitialized: isInitialized ?? this.isInitialized,
     );
   }
 }
