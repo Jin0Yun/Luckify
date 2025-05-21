@@ -1,11 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:luckify/core/exceptions/fortune_exception.dart';
+import 'package:luckify/core/logger/logger.dart';
+import 'package:luckify/data/repository/base_repository.dart';
 import 'package:luckify/domain/entity/fortune_entity.dart';
 import 'package:luckify/domain/entity/fortune_history_entity.dart';
 import 'package:luckify/domain/enum/fortune_type.dart';
 import 'package:luckify/domain/repository/fortune_history_repository.dart';
 
-class FortuneHistoryRepositoryImpl implements FortuneHistoryRepository {
+class FortuneHistoryRepositoryImpl extends BaseRepository
+    implements FortuneHistoryRepository {
   final FirebaseFirestore _firestore;
   final String? _userId;
 
@@ -14,8 +17,10 @@ class FortuneHistoryRepositoryImpl implements FortuneHistoryRepository {
   FortuneHistoryRepositoryImpl({
     required FirebaseFirestore firestore,
     String? userId,
+    AppLogger? logger,
   }) : _firestore = firestore,
-       _userId = userId;
+       _userId = userId,
+       super(logger: logger, tag: 'FortuneHistory');
 
   CollectionReference<Map<String, dynamic>> get _collection {
     if (_userId != null) {
@@ -27,61 +32,131 @@ class FortuneHistoryRepositoryImpl implements FortuneHistoryRepository {
     return _firestore.collection(_collectionName);
   }
 
-  Future<T> _wrapException<T>(Future<T> Function() action) async {
-    try {
-      return await action();
-    } catch (e) {
-      throw FortuneException(FortuneError.unknown, e is Exception ? e : null);
+  FortuneException _mapFirebaseException(FirebaseException e) {
+    switch (e.code) {
+      case 'permission-denied':
+        return FortuneException(FortuneError.permissionDenied, e);
+      case 'unavailable':
+        return FortuneException(FortuneError.networkError, e);
+      case 'not-found':
+        return FortuneException(FortuneError.documentNotFound, e);
+      default:
+        return FortuneException(FortuneError.unknown, e);
     }
   }
 
   @override
-  Future<List<FortuneHistoryEntity>> getFortuneHistories() async {
-    return _wrapException(() async {
-      final snapshot = await _collection.get();
-      return snapshot.docs
-          .map((doc) => _mapToEntity(doc.id, doc.data()))
-          .toList();
-    });
+  Future<List<FortuneHistoryEntity>> getFortuneHistories() {
+    return executeWithLogging(() async {
+      try {
+        final snapshot =
+            await _collection.orderBy('timestamp', descending: true).get();
+
+        return snapshot.docs
+            .map((doc) => _mapToEntity(doc.id, doc.data()))
+            .toList();
+      } on FirebaseException catch (e) {
+        throw _mapFirebaseException(e);
+      } catch (e) {
+        throw FortuneException(FortuneError.unknown, e is Exception ? e : null);
+      }
+    }, '운세 기록 조회');
   }
 
   @override
   Future<List<FortuneHistoryEntity>> getFortuneHistoriesByType(
     FortuneType type,
-  ) async {
-    return _wrapException(() async {
-      final snapshot =
-          await _collection
-              .where('fortune.type', isEqualTo: type.toString())
-              .get();
+  ) {
+    return executeWithLogging(
+      () async {
+        try {
+          final snapshot =
+              await _collection
+                  .where('fortune.type', isEqualTo: type.toString())
+                  .orderBy('timestamp', descending: true)
+                  .get();
 
-      return snapshot.docs
-          .map((doc) => _mapToEntity(doc.id, doc.data()))
-          .toList();
-    });
+          return snapshot.docs
+              .map((doc) => _mapToEntity(doc.id, doc.data()))
+              .toList();
+        } on FirebaseException catch (e) {
+          throw _mapFirebaseException(e);
+        } catch (e) {
+          throw FortuneException(
+            FortuneError.unknown,
+            e is Exception ? e : null,
+          );
+        }
+      },
+      '타입별 운세 기록 조회',
+      additionalInfo: type.toString(),
+    );
   }
 
   @override
-  Future<FortuneHistoryEntity?> getFortuneHistoryById(String id) async {
-    return _wrapException(() async {
-      final doc = await _collection.doc(id).get();
-      if (!doc.exists) return null;
-      return _mapToEntity(doc.id, doc.data()!);
-    });
+  Future<FortuneHistoryEntity?> getFortuneHistoryById(String id) {
+    return executeWithLogging(
+      () async {
+        try {
+          final doc = await _collection.doc(id).get();
+          if (!doc.exists) {
+            logger.w('운세 기록 없음: $id', tag: tag);
+            return null;
+          }
+
+          return _mapToEntity(doc.id, doc.data()!);
+        } on FirebaseException catch (e) {
+          throw _mapFirebaseException(e);
+        } catch (e) {
+          throw FortuneException(
+            FortuneError.unknown,
+            e is Exception ? e : null,
+          );
+        }
+      },
+      '단일 운세 기록 조회',
+      additionalInfo: id,
+    );
   }
 
   @override
-  Future<void> saveFortuneHistory(FortuneHistoryEntity history) async {
-    return _wrapException(() async {
-      await _collection.doc(history.id).set(_mapToJson(history));
-    });
+  Future<void> saveFortuneHistory(FortuneHistoryEntity history) {
+    return executeWithLogging(
+      () async {
+        try {
+          await _collection.doc(history.id).set(_mapToJson(history));
+        } on FirebaseException catch (e) {
+          throw _mapFirebaseException(e);
+        } catch (e) {
+          throw FortuneException(
+            FortuneError.unknown,
+            e is Exception ? e : null,
+          );
+        }
+      },
+      '운세 기록 저장',
+      additionalInfo: history.id,
+    );
   }
 
   @override
-  Future<void> deleteFortuneHistory(String id) async {
-    return _wrapException(() async {
-      await _collection.doc(id).delete();
-    });
+  Future<void> deleteFortuneHistory(String id) {
+    return executeWithLogging(
+      () async {
+        try {
+          await _collection.doc(id).delete();
+        } on FirebaseException catch (e) {
+          throw _mapFirebaseException(e);
+        } catch (e) {
+          throw FortuneException(
+            FortuneError.unknown,
+            e is Exception ? e : null,
+          );
+        }
+      },
+      '운세 기록 삭제',
+      additionalInfo: id,
+    );
   }
 
   FortuneHistoryEntity _mapToEntity(String docId, Map<String, dynamic> map) {
