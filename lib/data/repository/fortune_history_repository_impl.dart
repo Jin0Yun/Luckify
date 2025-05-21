@@ -1,18 +1,31 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:luckify/core/exceptions/fortune_exception.dart';
 import 'package:luckify/domain/entity/fortune_entity.dart';
 import 'package:luckify/domain/entity/fortune_history_entity.dart';
 import 'package:luckify/domain/enum/fortune_type.dart';
 import 'package:luckify/domain/repository/fortune_history_repository.dart';
-import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class FortuneHistoryRepositoryImpl implements FortuneHistoryRepository {
-  final SharedPreferences _prefs;
+  final FirebaseFirestore _firestore;
+  final String? _userId;
 
-  static const String _historyKey = 'fortune_histories';
+  static const String _collectionName = 'fortune_histories';
 
-  FortuneHistoryRepositoryImpl({required SharedPreferences prefs})
-    : _prefs = prefs;
+  FortuneHistoryRepositoryImpl({
+    required FirebaseFirestore firestore,
+    String? userId,
+  }) : _firestore = firestore,
+       _userId = userId;
+
+  CollectionReference<Map<String, dynamic>> get _collection {
+    if (_userId != null) {
+      return _firestore
+          .collection('users')
+          .doc(_userId)
+          .collection(_collectionName);
+    }
+    return _firestore.collection(_collectionName);
+  }
 
   Future<T> _wrapException<T>(Future<T> Function() action) async {
     try {
@@ -25,11 +38,10 @@ class FortuneHistoryRepositoryImpl implements FortuneHistoryRepository {
   @override
   Future<List<FortuneHistoryEntity>> getFortuneHistories() async {
     return _wrapException(() async {
-      final String? historyJson = _prefs.getString(_historyKey);
-      if (historyJson == null) return [];
-
-      final List<dynamic> decoded = jsonDecode(historyJson);
-      return decoded.map((item) => _mapToEntity(item)).toList();
+      final snapshot = await _collection.get();
+      return snapshot.docs
+          .map((doc) => _mapToEntity(doc.id, doc.data()))
+          .toList();
     });
   }
 
@@ -38,46 +50,43 @@ class FortuneHistoryRepositoryImpl implements FortuneHistoryRepository {
     FortuneType type,
   ) async {
     return _wrapException(() async {
-      final histories = await getFortuneHistories();
-      return histories.where((h) => h.fortune.type == type).toList();
+      final snapshot =
+          await _collection
+              .where('fortune.type', isEqualTo: type.toString())
+              .get();
+
+      return snapshot.docs
+          .map((doc) => _mapToEntity(doc.id, doc.data()))
+          .toList();
     });
   }
 
   @override
   Future<FortuneHistoryEntity?> getFortuneHistoryById(String id) async {
     return _wrapException(() async {
-      final histories = await getFortuneHistories();
-      return histories.firstWhere((h) => h.id == id);
+      final doc = await _collection.doc(id).get();
+      if (!doc.exists) return null;
+      return _mapToEntity(doc.id, doc.data()!);
     });
   }
 
   @override
   Future<void> saveFortuneHistory(FortuneHistoryEntity history) async {
     return _wrapException(() async {
-      final String? historyJson = _prefs.getString(_historyKey);
-      final List<dynamic> histories =
-          historyJson != null ? jsonDecode(historyJson) : [];
-      histories.add(_mapToJson(history));
-      await _prefs.setString(_historyKey, jsonEncode(histories));
+      await _collection.doc(history.id).set(_mapToJson(history));
     });
   }
 
   @override
   Future<void> deleteFortuneHistory(String id) async {
     return _wrapException(() async {
-      final historyJson = _prefs.getString(_historyKey);
-      if (historyJson == null) return;
-
-      final List<dynamic> decoded = jsonDecode(historyJson);
-      final filtered = decoded.where((item) => item['id'] != id).toList();
-
-      await _prefs.setString(_historyKey, jsonEncode(filtered));
+      await _collection.doc(id).delete();
     });
   }
 
-  FortuneHistoryEntity _mapToEntity(Map<String, dynamic> map) {
+  FortuneHistoryEntity _mapToEntity(String docId, Map<String, dynamic> map) {
     return FortuneHistoryEntity(
-      id: map['id'],
+      id: docId,
       fortune: FortuneEntity(
         id: map['fortune']['id'],
         name: map['fortune']['name'],
@@ -87,14 +96,13 @@ class FortuneHistoryRepositoryImpl implements FortuneHistoryRepository {
         iconPath: map['fortune']['iconPath'] ?? '',
       ),
       content: map['content'],
-      timestamp: DateTime.parse(map['timestamp']),
+      timestamp: (map['timestamp'] as Timestamp).toDate(),
       userInput: map['userInput'],
     );
   }
 
   Map<String, dynamic> _mapToJson(FortuneHistoryEntity entity) {
     return {
-      'id': entity.id,
       'fortune': {
         'id': entity.fortune.id,
         'name': entity.fortune.name,
@@ -102,7 +110,7 @@ class FortuneHistoryRepositoryImpl implements FortuneHistoryRepository {
         'iconPath': entity.fortune.iconPath,
       },
       'content': entity.content,
-      'timestamp': entity.timestamp.toIso8601String(),
+      'timestamp': Timestamp.fromDate(entity.timestamp),
       'userInput': entity.userInput,
     };
   }
