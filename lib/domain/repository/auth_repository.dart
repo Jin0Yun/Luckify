@@ -9,4 +9,5 @@ abstract class AuthRepository {
   Future<void> signOut();
   Stream<UserEntity> get authStateChanges;
   UserEntity get currentUser;
+  Future<void> deleteAccount();
 }
