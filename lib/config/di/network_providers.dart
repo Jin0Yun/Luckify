@@ -27,5 +27,5 @@ final dioProvider = Provider<Dio>((ref) {
 });
 
 final networkClientProvider = Provider<NetworkClientInterface>((ref) {
-  return NetworkClient(ref.watch(dioProvider), ref.watch(loggerProvider));
+  return NetworkClient(ref.watch(dioProvider));
 });
