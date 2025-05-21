@@ -8,39 +8,33 @@ import 'package:luckify/presentation/screen/fortune_screen.dart';
 import 'package:luckify/presentation/screen/my_fortune_screen.dart';
 import 'package:luckify/presentation/screen/profile_screen.dart';
 
-class MainScreen extends ConsumerStatefulWidget {
+class MainScreen extends ConsumerWidget {
   const MainScreen({super.key});
 
   @override
-  ConsumerState<MainScreen> createState() => _MainScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final viewModel = ref.watch(mainTabViewModelProvider);
+    final currentIndex = viewModel.selectedIndex;
 
-class _MainScreenState extends ConsumerState<MainScreen> {
-  int _currentIndex = 0;
-
-  static const EdgeInsets _navIconPadding = EdgeInsets.only(bottom: 4, top: 6);
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(fortuneHistoryViewModelProvider.notifier).loadHistories();
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _buildAppBar(),
-      body: _buildBody(),
-      bottomNavigationBar: _buildBottomNavigationBar(),
+      appBar: _buildAppBar(context, currentIndex, ref),
+      body: _buildBody(currentIndex),
+      bottomNavigationBar: _buildBottomNavigationBar(
+        context,
+        currentIndex,
+        ref,
+      ),
     );
   }
 
-  AppBar _buildAppBar() {
+  PreferredSizeWidget _buildAppBar(
+    BuildContext context,
+    int currentIndex,
+    WidgetRef ref,
+  ) {
     return AppBar(
       title: Text(
-        _currentIndex == 0 ? '' : UITextConstants.myFortuneTitle,
+        currentIndex == 0 ? '' : UITextConstants.myFortuneTitle,
         style: LuckifyTextStyles.appBarTitle.copyWith(
           color: LuckifyColors.primary,
         ),
@@ -53,23 +47,30 @@ class _MainScreenState extends ConsumerState<MainScreen> {
         IconButton(
           icon: const Icon(Icons.person, size: 28),
           padding: const EdgeInsets.all(16.0),
-          onPressed: _navigateToProfileScreen,
+          onPressed: () => _navigateToProfileScreen(context),
         ),
       ],
     );
   }
 
-  Widget _buildBody() {
+  Widget _buildBody(int currentIndex) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 22.0),
       child: IndexedStack(
-        index: _currentIndex,
-        children: const [FortuneScreen(), MyFortuneScreen()],
+        index: currentIndex,
+        children: [
+          const FortuneScreen(),
+          MyFortuneScreen(key: ValueKey(currentIndex == 1)),
+        ],
       ),
     );
   }
 
-  Widget _buildBottomNavigationBar() {
+  Widget _buildBottomNavigationBar(
+    BuildContext context,
+    int currentIndex,
+    WidgetRef ref,
+  ) {
     return Container(
       decoration: BoxDecoration(
         color: LuckifyColors.white,
@@ -97,8 +98,11 @@ class _MainScreenState extends ConsumerState<MainScreen> {
           topRight: Radius.circular(16),
         ),
         child: BottomNavigationBar(
-          currentIndex: _currentIndex,
-          onTap: _onTabTapped,
+          currentIndex: currentIndex,
+          onTap:
+              (index) => ref
+                  .read(mainTabViewModelProvider.notifier)
+                  .setTabIndex(index),
           backgroundColor: LuckifyColors.white,
           selectedItemColor: LuckifyColors.primary,
           unselectedItemColor: LuckifyColors.grey.withValues(alpha: 0.6),
@@ -118,36 +122,28 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     );
   }
 
-  void _onTabTapped(int index) {
-    if (index == 1 && _currentIndex != index) {
-      ref.read(fortuneHistoryViewModelProvider.notifier).loadHistories();
-      ref.read(fortuneHistoryViewModelProvider.notifier).setSelectedTabIndex(0);
-    }
-    setState(() {
-      _currentIndex = index;
-    });
-  }
-
   BottomNavigationBarItem _buildNavItem(IconData iconData, String label) {
+    const EdgeInsets navIconPadding = EdgeInsets.only(bottom: 4, top: 6);
+
     return BottomNavigationBarItem(
       icon: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Padding(padding: _navIconPadding, child: Icon(iconData)),
+          Padding(padding: navIconPadding, child: Icon(iconData)),
           Container(height: 3, color: Colors.transparent),
         ],
       ),
       activeIcon: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Padding(padding: _navIconPadding, child: Icon(iconData, size: 28)),
+          Padding(padding: navIconPadding, child: Icon(iconData, size: 28)),
         ],
       ),
       label: label,
     );
   }
 
-  void _navigateToProfileScreen() {
+  void _navigateToProfileScreen(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const ProfileScreen()),

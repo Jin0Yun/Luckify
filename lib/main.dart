@@ -7,23 +7,15 @@ import 'package:luckify/firebase_options.dart';
 import 'package:luckify/core/theme/luckify_colors.dart';
 import 'package:luckify/presentation/screen/login_screen.dart';
 import 'package:luckify/presentation/screen/main_screen.dart';
-import 'package:luckify/config/di/repository_providers.dart';
 import 'package:luckify/config/di/viewmodel_providers.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await dotenv.load(fileName: ".env");
-  final sharedPrefs = await SharedPreferences.getInstance();
 
-  runApp(
-    ProviderScope(
-      overrides: [sharedPrefsProvider.overrideWithValue(sharedPrefs)],
-      child: const MyApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends ConsumerWidget {

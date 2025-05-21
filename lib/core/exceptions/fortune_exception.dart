@@ -4,6 +4,8 @@ enum FortuneError {
   apiError,
   parsingError,
   networkError,
+  permissionDenied,
+  documentNotFound,
   unknown,
 }
 
@@ -20,6 +22,10 @@ extension FortuneErrorMessage on FortuneError {
         return '응답 데이터 처리 중 오류가 발생했습니다.';
       case FortuneError.networkError:
         return '네트워크 연결을 확인해주세요.';
+      case FortuneError.permissionDenied:
+        return '데이터 접근 권한이 없습니다.';
+      case FortuneError.documentNotFound:
+        return '요청한 운세 기록을 찾을 수 없습니다.';
       case FortuneError.unknown:
         return '운세 조회 중 오류가 발생했습니다.';
     }

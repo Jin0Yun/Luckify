@@ -34,22 +34,38 @@ class FortuneHistoryViewModel extends BaseViewModel<FortuneHistoryState> {
   }
 
   Future<void> loadHistories() async {
-    await runWithLoading(() async {
-      final histories = await _repository.getFortuneHistories();
-      histories.sort((a, b) => b.timestamp.compareTo(a.timestamp));
-      state = state.copyWith(histories: histories);
-    });
+    if (state.isRequestInProgress) return;
+
+    state = state.copyWith(isRequestInProgress: true);
+
+    try {
+      await runWithLoading(() async {
+        final histories = await _repository.getFortuneHistories();
+        histories.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+        state = state.copyWith(histories: histories, isInitialized: true);
+      });
+    } finally {
+      state = state.copyWith(isRequestInProgress: false);
+    }
   }
 
   Future<void> loadHistoriesByType(FortuneType? type) async {
-    await runWithLoading(() async {
-      final histories =
-          type == null
-              ? await _repository.getFortuneHistories()
-              : await _repository.getFortuneHistoriesByType(type);
-      histories.sort((a, b) => b.timestamp.compareTo(a.timestamp));
-      state = state.copyWith(histories: histories);
-    });
+    if (state.isRequestInProgress) return;
+
+    state = state.copyWith(isRequestInProgress: true);
+
+    try {
+      await runWithLoading(() async {
+        final histories =
+            type == null
+                ? await _repository.getFortuneHistories()
+                : await _repository.getFortuneHistoriesByType(type);
+        histories.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+        state = state.copyWith(histories: histories, isInitialized: true);
+      });
+    } finally {
+      state = state.copyWith(isRequestInProgress: false);
+    }
   }
 
   Future<void> deleteHistory(String id) async {
@@ -60,6 +76,8 @@ class FortuneHistoryViewModel extends BaseViewModel<FortuneHistoryState> {
   }
 
   void setSelectedTabIndex(int index) {
+    if (state.selectedTabIndex == index) return;
+
     state = state.copyWith(selectedTabIndex: index);
 
     switch (index) {
@@ -101,4 +119,5 @@ class FortuneHistoryViewModel extends BaseViewModel<FortuneHistoryState> {
 
   List<FortuneHistoryEntity> get histories => state.histories;
   int get selectedTabIndex => state.selectedTabIndex;
+  bool get isInitialized => state.isInitialized;
 }
