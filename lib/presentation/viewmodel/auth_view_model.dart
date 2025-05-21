@@ -45,6 +45,10 @@ class AuthViewModel extends BaseViewModel<AuthState> {
     await runWithLoading(() => _authRepository.signOut());
   }
 
+  Future<void> deleteAccount() async {
+    await runWithLoading(() => _authRepository.deleteAccount());
+  }
+
   @override
   void dispose() {
     _authSubscription?.cancel();

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:luckify/core/exceptions/fortune_exception.dart';
 import 'package:luckify/data/repository/base_repository.dart';
 import 'package:luckify/domain/entity/fortune_entity.dart';
@@ -22,12 +23,16 @@ class FortuneHistoryRepositoryImpl extends BaseRepository
        super(tag: 'FortuneHistory');
 
   CollectionReference<Map<String, dynamic>> get _collection {
-    if (_userId != null) {
+    final userId = _userId ?? FirebaseAuth.instance.currentUser?.uid;
+
+    if (userId != null) {
       return _firestore
           .collection('users')
-          .doc(_userId)
+          .doc(userId)
           .collection(_collectionName);
     }
+
+    logger.e('사용자 ID가 없습니다. 운세 기록을 가져올 수 없습니다.', tag: tag);
     return _firestore.collection(_collectionName);
   }
 

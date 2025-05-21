@@ -7,6 +7,9 @@ enum AuthError {
   userDisabled,
   operationNotAllowed,
   unknown,
+  notAuthenticated,
+  deletionFailed,
+  authenticationRequired,
 }
 
 extension AuthErrorMessage on AuthError {
@@ -26,6 +29,12 @@ extension AuthErrorMessage on AuthError {
         return '비활성화된 계정입니다.';
       case AuthError.operationNotAllowed:
         return '이 로그인 방식은 현재 지원되지 않습니다.';
+      case AuthError.notAuthenticated:
+        return '로그인 상태가 아닙니다. 다시 로그인해주세요.';
+      case AuthError.deletionFailed:
+        return '계정 삭제 중 오류가 발생했습니다.';
+      case AuthError.authenticationRequired:
+        return '보안을 위해 재인증이 필요합니다.';
       case AuthError.unknown:
         return '로그인 중 오류가 발생했습니다.';
     }

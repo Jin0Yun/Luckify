@@ -244,9 +244,28 @@ class ProfileScreen extends ConsumerWidget {
           isDestructive: true,
           barrierDismissible: true,
         )
-        .then((confirmed) {
+        .then((confirmed) async {
           if (confirmed == true) {
-            /// 회원탈퇴
+            try {
+              await authViewModel.deleteAccount();
+              if (context.mounted) {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                  (route) => false,
+                );
+              }
+            } catch (e) {
+              if (context.mounted) {
+                final alertService = LuckifyAlertService();
+                alertService.showAlert(
+                  context: context,
+                  title: '오류',
+                  content: '회원 탈퇴 중 오류가 발생했습니다. \n다시 시도해주세요.',
+                  confirmText: '확인',
+                  barrierDismissible: true,
+                );
+              }
+            }
           }
         });
   }
