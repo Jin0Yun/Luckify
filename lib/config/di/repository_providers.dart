@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -13,7 +14,6 @@ import 'package:luckify/data/repository/fortune_repository_impl.dart';
 import 'package:luckify/domain/repository/auth_repository.dart';
 import 'package:luckify/domain/repository/fortune_history_repository.dart';
 import 'package:luckify/domain/repository/fortune_repository.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 final messageMapperProvider = Provider<MessageMapper>((ref) => MessageMapper());
 
@@ -38,19 +38,27 @@ final fortuneRepositoryProvider = Provider<FortuneRepository>((ref) {
   );
 });
 
-final authRepositoryProvider = Provider<AuthRepository>((ref) {
-  return FirebaseAuthRepository(
-    firebaseAuth: FirebaseAuth.instance,
-    googleSignIn: GoogleSignIn(),
-  );
+final firebaseAuthProvider = Provider<FirebaseAuth>((ref) {
+  return FirebaseAuth.instance;
 });
 
-final sharedPrefsProvider = Provider<SharedPreferences>((ref) {
-  throw UnimplementedError('Initialize this in main.dart');
+final firestoreProvider = Provider<FirebaseFirestore>((ref) {
+  return FirebaseFirestore.instance;
+});
+
+final authRepositoryProvider = Provider<AuthRepository>((ref) {
+  return FirebaseAuthRepository(
+    firebaseAuth: ref.watch(firebaseAuthProvider),
+    googleSignIn: GoogleSignIn(),
+  );
 });
 
 final fortuneHistoryRepositoryProvider = Provider<FortuneHistoryRepository>((
   ref,
 ) {
-  return FortuneHistoryRepositoryImpl(prefs: ref.watch(sharedPrefsProvider));
+  final firestore = ref.watch(firestoreProvider);
+  final auth = ref.watch(firebaseAuthProvider);
+  final userId = auth.currentUser?.uid;
+
+  return FortuneHistoryRepositoryImpl(firestore: firestore, userId: userId);
 });
