@@ -11,6 +11,15 @@ import 'package:luckify/presentation/viewmodel/fortune_list_state.dart';
 import 'package:luckify/presentation/viewmodel/fortune_list_view_model.dart';
 import 'package:luckify/presentation/viewmodel/fortune_message_state.dart';
 import 'package:luckify/presentation/viewmodel/fortune_message_view_model.dart';
+import 'package:luckify/presentation/viewmodel/main_tab_state.dart';
+import 'package:luckify/presentation/viewmodel/main_tab_view_model.dart';
+
+final mainTabViewModelProvider =
+    StateNotifierProvider<MainTabViewModel, MainTabState>((ref) {
+      return MainTabViewModel(
+        ref.read(fortuneHistoryViewModelProvider.notifier),
+      );
+    });
 
 final fortuneListViewModelProvider =
     StateNotifierProvider<FortuneListViewModel, FortuneListState>(
