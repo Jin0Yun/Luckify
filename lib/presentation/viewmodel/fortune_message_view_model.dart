@@ -108,6 +108,10 @@ class FortuneMessageViewModel extends BaseViewModel<FortuneMessageState> {
     String loadingContent, {
     bool saveToHistory = true,
   }) async {
+    if (state.isRequestInProgress) return;
+
+    state = state.copyWith(isRequestInProgress: true);
+
     final loadingMessage = FortuneMessageEntity(
       id: _uuidGenerator.generate(),
       content: loadingContent,
@@ -128,6 +132,8 @@ class FortuneMessageViewModel extends BaseViewModel<FortuneMessageState> {
     } catch (e) {
       if (!mounted) return;
       _handleError(loadingMessage.id);
+    } finally {
+      state = state.copyWith(isRequestInProgress: false);
     }
   }
 
