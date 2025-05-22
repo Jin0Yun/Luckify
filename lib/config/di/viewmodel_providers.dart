@@ -1,0 +1,52 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:luckify/config/di/core_providers.dart';
+import 'package:luckify/config/di/repository_providers.dart';
+import 'package:luckify/config/di/usecase_providers.dart';
+import 'package:luckify/domain/entity/fortune_entity.dart';
+import 'package:luckify/presentation/viewmodel/auth_state.dart';
+import 'package:luckify/presentation/viewmodel/auth_view_model.dart';
+import 'package:luckify/presentation/viewmodel/fortune_history_state.dart';
+import 'package:luckify/presentation/viewmodel/fortune_history_view_model.dart';
+import 'package:luckify/presentation/viewmodel/fortune_list_state.dart';
+import 'package:luckify/presentation/viewmodel/fortune_list_view_model.dart';
+import 'package:luckify/presentation/viewmodel/fortune_message_state.dart';
+import 'package:luckify/presentation/viewmodel/fortune_message_view_model.dart';
+import 'package:luckify/presentation/viewmodel/main_tab_state.dart';
+import 'package:luckify/presentation/viewmodel/main_tab_view_model.dart';
+
+final mainTabViewModelProvider =
+    StateNotifierProvider<MainTabViewModel, MainTabState>((ref) {
+      return MainTabViewModel(
+        ref.read(fortuneHistoryViewModelProvider.notifier),
+      );
+    });
+
+final fortuneListViewModelProvider =
+    StateNotifierProvider<FortuneListViewModel, FortuneListState>(
+      (ref) =>
+          FortuneListViewModel(repository: ref.read(fortuneRepositoryProvider)),
+    );
+
+final fortuneViewModelProvider = StateNotifierProvider.autoDispose
+    .family<FortuneMessageViewModel, FortuneMessageState, FortuneEntity>(
+      (ref, selectedFortune) => FortuneMessageViewModel(
+        selectedFortune: selectedFortune,
+        getFortuneReadingUseCase: ref.read(getFortuneReadingUseCaseProvider),
+        uuidGenerator: ref.read(uuidGeneratorProvider),
+        historyRepository: ref.read(fortuneHistoryRepositoryProvider),
+      ),
+    );
+
+final fortuneHistoryViewModelProvider =
+    StateNotifierProvider<FortuneHistoryViewModel, FortuneHistoryState>(
+      (ref) => FortuneHistoryViewModel(
+        repository: ref.read(fortuneHistoryRepositoryProvider),
+        dateFormatter: ref.read(dateFormatterProvider),
+      ),
+    );
+
+final authViewModelProvider = StateNotifierProvider<AuthViewModel, AuthState>((
+  ref,
+) {
+  return AuthViewModel(authRepository: ref.read(authRepositoryProvider));
+});
