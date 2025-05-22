@@ -75,6 +75,16 @@ jobs:
           channel: 'stable'
           cache: true
 
+      - name: Cache Gradle
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
       - name: Install dependencies
         run: flutter pub get
 
@@ -86,13 +96,12 @@ jobs:
           echo "${{ secrets.FIREBASE_OPTIONS }}" > lib/firebase_options.dart
 
       - name: Build APK
-        run: flutter build apk --release
+        if: github.event_name == 'pull_request'
+        run: flutter build apk --debug
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: android-release-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+      - name: Build APK Release
+        if: github.event_name != 'pull_request'
+        run: flutter build apk --release
 
   build_ios:
     runs-on: macos-latest
@@ -107,6 +116,14 @@ jobs:
           channel: 'stable'
           cache: true
 
+      - name: Cache CocoaPods
+        uses: actions/cache@v3
+        with:
+          path: ios/Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pods-
+
       - name: Install dependencies
         run: flutter pub get
 
@@ -117,5 +134,15 @@ jobs:
         run: |
           echo "${{ secrets.FIREBASE_OPTIONS }}" > lib/firebase_options.dart
 
-      - name: Build iOS
+      - name: Install CocoaPods
+        run: |
+          cd ios
+          pod install
+
+      - name: Build iOS Debug
+        if: github.event_name == 'pull_request'
+        run: flutter build ios --debug --no-codesign
+
+      - name: Build iOS Release
+        if: github.event_name != 'pull_request'
         run: flutter build ios --release --no-codesign
