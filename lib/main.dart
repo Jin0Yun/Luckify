@@ -39,6 +39,7 @@ class MyApp extends ConsumerWidget {
     final authState = ref.watch(authViewModelProvider);
 
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         scaffoldBackgroundColor: LuckifyColors.white,
         primaryColor: LuckifyColors.primary,
