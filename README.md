@@ -20,11 +20,12 @@ OpenAI API를 통해 오늘의 운세와 별자리 운세를 실시간으로 생
 
 | Google 소셜 로그인 | 오늘의 운세/별자리 운세 선택 | 실시간 AI 운세 생성 |
 |---|---|---|
-| <img src="https://github.com/user-attachments/assets/17b61196-5c9b-4c19-93e2-a20efa94ec7b" width="280" height="520"> | <img src="https://github.com/user-attachments/assets/d39e05fd-2e0f-49bb-b82a-0c606995c188" width="280" height="520"> | <img src="https://github.com/user-attachments/assets/786a802a-c342-4f55-b214-fa28c4ed2cc1" width="280" height="520"> |
+| <img src="https://github.com/user-attachments/assets/2a6ec355-9bca-4fc2-8359-1578a4145948" width="280" height="520"> | <img src="https://github.com/user-attachments/assets/d39e05fd-2e0f-49bb-b82a-0c606995c188" width="280" height="520"> | <img src="https://github.com/user-attachments/assets/786a802a-c342-4f55-b214-fa28c4ed2cc1" width="280" height="520"> |
 
 | 운세 히스토리 | 프로필 관리 | 히스토리 삭제 |
 |---|---|---|
 | <img src="https://github.com/user-attachments/assets/ce3b15cf-a59c-4782-8503-713997cd75e1" width="280" height="520"> | <img src="https://github.com/user-attachments/assets/804d917d-a65a-47d0-9b1c-74a5c9cf7a23" width="280" height="520"> | <img src="https://github.com/user-attachments/assets/e978bae1-ec88-42df-883d-6ad9f9bb1238" width="280" height="520"> |
+
 
 
 ## 🌟 개발 환경 및 라이브러리
