@@ -106,100 +106,57 @@ lib/
 ---
 
 ## 🌟 개발 과정에서 해결한 문제들
-> Google 로그인 API 연동 이슈
-> 
+
+> **autoDispose를 활용한 메모리 최적화**
+
+**문제**: 운세 채팅방을 나갔다가 다시 진입했을 때 이전 대화 내용이 그대로 유지되어 새로운 운세 조회가 불가능한 현상
+
+**원인**: StateNotifierProvider.family 상태가 화면 생명주기와 독립적으로 앱 전체에서 유지되어 메모리에 계속 남아있음
+
+**해결**: Riverpod의 autoDispose 수정자를 사용하여 상태 생명주기를 화면과 연결
+
+```dart
+// Before: 상태가 앱 전체에서 유지
+final fortuneViewModelProvider = StateNotifierProvider.family<
+  FortuneViewModel, FortuneState, FortuneEntity
+>((ref, selectedFortune) => FortuneViewModel(...));
+
+// After: 화면 종료 시 상태 자동 해제
+final fortuneViewModelProvider = StateNotifierProvider.autoDispose.family<
+  FortuneViewModel, FortuneState, FortuneEntity
+>((ref, selectedFortune) => FortuneViewModel(...));
+```
+
+**결과**: 채팅방 재진입 시 항상 새로운 대화로 시작 가능, 메모리 효율성 향상
+
+---
+
+> **Google 로그인 SHA-1 인증서 불일치 해결**
 
 **문제**: Google 로그인 시도 시 `ApiException: 12500` 오류가 지속적으로 발생
 
-**원인**: 개발 환경에서는 정상 작동하지만 특정 빌드에서만 실패하며, Firebase 프로젝트 설정과 앱 환경 간 불일치 발생
+**원인**: Firebase 콘솔에 등록된 SHA-1 인증서 지문과 실제 앱의 SHA-1 값이 불일치하여 Google OAuth 인증 과정에서 앱 신원 확인 실패
 
-**해결**: Firebase 프로젝트 설정 재검토 및 정확한 SHA-1 인증서 지문 등록
+**해결**: gradlew signingReport로 정확한 SHA-1 값 추출 후 Firebase 프로젝트 설정 업데이트
+
+```bash
+# 정확한 SHA-1 지문 추출
+$ ./gradlew signingReport
+```
 
 ```dart
-// Firebase 콘솔 설정과 일치하는 SHA-1 지문 확인
-$ ./gradlew signingReport
-
 // Google Sign-In 구성 최적화
 final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 if (googleUser == null) {
   throw AuthException(AuthError.cancelled);
 }
 
-final credential = firebase_auth.GoogleAuthProvider.credential(
+final credential = GoogleAuthProvider.credential(
   accessToken: googleAuth.accessToken,
   idToken: googleAuth.idToken,
 );
 ```
 
 **결과**: 개발 환경에서 안정적인 Google 소셜 로그인 구현 완료
-
----
-
-> Firebase 재인증 보안 이슈
-> 
-
-**문제**: 회원 탈퇴 시 `requires-recent-login` 에러로 계정 삭제 실패
-
-**원인**: Firebase 보안 정책상 민감한 작업 시 최근 로그인 증명 요구, 사용자가 재로그인해야 하는 번거로운 UX 문제
-
-**해결**: Google Sign-In을 활용한 자동 재인증 플로우 설계 및 무중단 재인증 구현
-
-```dart
-Future<bool> _reauthenticateAndDeleteAccount(User user) async {
-  try {
-    // 자동 재인증 시도
-    GoogleSignInAccount? googleUser = await _googleSignIn.signInSilently();
-    if (googleUser == null) {
-      googleUser = await _googleSignIn.signIn();
-    }
-
-    final credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth.accessToken,
-      idToken: googleAuth.idToken,
-    );
-
-    await user.reauthenticateWithCredential(credential);
-    await user.delete();
-    return true;
-  } catch (e) {
-    return false;
-  }
-}
-```
-
-**결과**: 사용자 개입 없이 원활한 계정 삭제 프로세스 완성
-
----
-
-> 앱 생명주기 관리 문제
-> 
-
-**문제**: API 호출 중 화면 이탈 시 `Bad state: Tried to use ViewModel after dispose` 크래시 발생
-
-**원인**: 비동기 작업 완료 전 ViewModel이 dispose되어 상태 업데이트 실패, 사용자 경험 저하 및 앱 안정성 문제
-
-**해결**: 모든 상태 업데이트 메서드에 mounted 상태 체크 로직 추가 및 안전장치 구현
-
-```dart
-Future<void> _requestWithLoading(
-  Future<FortuneMessageEntity> Function() action,
-  String loadingContent,
-) async {
-  if (state.isRequestInProgress) return;
-
-  try {
-    final result = await runWithLoading(action);
-    if (!mounted) return;  // 생명주기 체크
-
-    removeMessage(loadingMessage.id);
-    addMessage(result);
-  } catch (e) {
-    if (!mounted) return;  // dispose 후 상태 업데이트 방지
-    _handleError(loadingMessage.id);
-  }
-}
-```
-
-**결과**: 화면 전환 시에도 안정적인 앱 동작 보장 및 크래시 완전 해결
 
 ---
